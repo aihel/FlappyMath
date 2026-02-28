@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Flappy Math - SansiAsaf</title>
     <style>
         * {
@@ -10,25 +10,27 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            background: #000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
         }
 
         #gameContainer {
             position: relative;
-            width: 288px;
-            height: 512px;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 700px;
             overflow: hidden;
-            border-radius: 10px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             background: #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         canvas {
@@ -37,47 +39,70 @@
             left: 0;
             width: 100%;
             height: 100%;
-            image-rendering: pixelated;
+            display: block;
             image-rendering: crisp-edges;
+            image-rendering: pixelated;
+            touch-action: none; /* Swipe'ı tamamen kapat */
         }
 
         #infoBtn {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 30px;
-            height: 30px;
-            background: rgba(255,255,255,0.9);
-            border: 2px solid #333;
+            top: 15px;
+            left: 15px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.95);
+            border: 3px solid #333;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             color: #333;
             cursor: pointer;
-            z-index: 20;
+            z-index: 30;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
         }
 
-        #infoBtn:hover {
+        #infoBtn:active {
+            transform: scale(0.9);
             background: #ffd700;
-            transform: scale(1.1);
         }
 
         #infoMessage {
             position: absolute;
-            top: 50px;
-            left: 10px;
-            background: rgba(0,0,0,0.8);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 5px;
-            font-size: 14px;
-            z-index: 15;
+            top: 70px;
+            left: 15px;
+            background: rgba(0,0,0,0.85);
+            color: #ffd700;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 25;
             display: none;
-            border-left: 3px solid #ffd700;
+            border-left: 4px solid #ffd700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 42px;
+            font-weight: bold;
+            text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(0,0,0,0.5);
+            z-index: 5;
+            font-family: 'Arial Black', sans-serif;
         }
 
         #questionPanel {
@@ -86,106 +111,176 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 10;
+            background: linear-gradient(145deg, #1a2f3f, #0f1a24);
+            z-index: 20;
             display: none;
             flex-direction: column;
-            padding: 20px;
+            padding: 25px 20px;
             color: white;
             overflow-y: auto;
+            animation: fadeIn 0.3s;
         }
 
-        #questionText {
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 15px;
-            padding: 10px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 5px;
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #questionHeader {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
 
         #questionType {
+            background: #ffd700;
+            color: #1a2f3f;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #questionCount {
+            background: rgba(255,255,255,0.15);
+            padding: 8px 16px;
+            border-radius: 30px;
             font-size: 14px;
-            color: #ffd700;
-            margin-bottom: 10px;
-            padding: 5px;
-            background: rgba(255,215,0,0.1);
-            border-radius: 3px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        #questionText {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 15px;
+            border-left: 5px solid #ffd700;
+            font-weight: 500;
         }
 
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin: 20px 0;
+            gap: 15px;
+            margin: 20px 0 30px;
         }
 
         .option-btn {
             background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.15);
             color: white;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 18px 20px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: left;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
         }
 
         .option-btn:hover {
             background: rgba(255,255,255,0.2);
-            transform: translateX(5px);
+            transform: translateX(8px);
+        }
+
+        .option-btn:active {
+            transform: scale(0.98);
+        }
+
+        .option-btn.correct-highlight {
+            background: rgba(46, 204, 113, 0.3);
+            border-color: #2ecc71;
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+        }
+
+        .option-btn.wrong-highlight {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
         }
 
         .option-btn.selected-correct {
-            background: rgba(0,255,0,0.3);
-            border-color: #00ff00;
-        }
-
-        .option-btn.selected-wrong {
-            background: rgba(255,0,0,0.3);
-            border-color: #ff0000;
-        }
-
-        #solutionText {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(0,100,200,0.3);
-            border-left: 3px solid #00ff00;
-            border-radius: 5px;
-            font-size: 14px;
-            line-height: 1.6;
-            display: none;
-        }
-
-        #nextQuestionBtn {
-            margin-top: 20px;
-            padding: 15px;
-            background: #ffd700;
-            color: #333;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: none;
-        }
-
-        #nextQuestionBtn:hover {
-            background: #ffed4a;
+            background: linear-gradient(145deg, #27ae60, #2ecc71);
+            border-color: #fff;
             transform: scale(1.02);
         }
 
-        #score {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            font-size: 24px;
+        .option-btn.selected-wrong {
+            background: linear-gradient(145deg, #c0392b, #e74c3c);
+            border-color: #fff;
+        }
+
+        #solutionText {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 5px solid #3498db;
+            border-radius: 10px;
+            font-size: 16px;
+            line-height: 1.7;
+            display: none;
+            backdrop-filter: blur(5px);
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        #nextQuestionBtn {
+            margin-top: 15px;
+            padding: 18px;
+            background: linear-gradient(145deg, #f39c12, #ffd700);
+            color: #1a2f3f;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
             font-weight: bold;
-            text-shadow: 2px 2px 0 #000;
-            z-index: 5;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+            box-shadow: 0 8px 15px rgba(243, 156, 18, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #nextQuestionBtn:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 10px rgba(243, 156, 18, 0.4);
+        }
+
+        #continueBtn {
+            margin-top: 15px;
+            padding: 18px;
+            background: linear-gradient(145deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: none;
+            box-shadow: 0 8px 15px rgba(46, 204, 113, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #continueBtn:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 400px) {
+            #questionText { font-size: 16px; }
+            .option-btn { padding: 15px; font-size: 16px; }
         }
     </style>
 </head>
@@ -197,93 +292,119 @@
         <div id="score">0</div>
         
         <div id="questionPanel">
-            <div id="questionType"></div>
+            <div id="questionHeader">
+                <span id="questionType"></span>
+                <span id="questionCount"></span>
+            </div>
             <div id="questionText"></div>
             <div class="options-container" id="optionsContainer"></div>
             <div id="solutionText"></div>
             <button id="nextQuestionBtn" onclick="loadNewQuestion()">Başka Soruya Geç →</button>
+            <button id="continueBtn" onclick="continueGame()">Oyuna Dön →</button>
         </div>
     </div>
 
     <script>
-        // Canvas ve context
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        
+        // Canvas boyutunu ekrana tam sığdır
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            canvas.width = 288;
+            canvas.height = 512;
+            canvas.style.width = '100%';
+            canvas.style.height = '100%';
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
         
         // Oyun değişkenleri
         let gameActive = true;
         let questionMode = false;
         let score = 0;
+        let correctAnswered = false; // Doğru cevap verildi mi?
         let bird = {
-            x: 50,
-            y: 200,
+            x: 60, // Biraz sağa kaydıralım
+            y: 250,
             width: 34,
             height: 24,
             velocity: 0,
-            gravity: 0.25,
-            jump: -5,
+            gravity: 0.2, // Daha yumuşak
+            jump: -4.8,
             frame: 0
         };
         
         let pipes = [];
         const PIPE_WIDTH = 52;
-        const PIPE_GAP = 120;
-        const PIPE_SPACING = 200;
+        const PIPE_GAP = 130; // Biraz daha geniş
         let frameCount = 0;
         let nightMode = false;
         let baseX = 0;
         
-        // Soru havuzu (7. sınıf doğru/ters orantı - 90+ soru)
+        // Soru havuzu (100 soru)
         const questions = [];
-        
-        // 90+ soru oluştur
         for (let i = 1; i <= 100; i++) {
-            if (i % 2 === 0) {
-                // Doğru orantı soruları
-                const a = Math.floor(Math.random() * 8) + 2; // 2-10 arası
-                const b = Math.floor(Math.random() * 8) + 2;
+            if (i % 3 === 0) {
+                // Doğru orantı
+                const a = Math.floor(Math.random() * 5) + 2;
+                const b = Math.floor(Math.random() * 8) + 3;
+                const correct = (a * 2.5).toFixed(1);
                 questions.push({
                     id: i,
-                    text: `${a} kg portakaldan ${b} litre meyve suyu çıkıyor. Buna göre 1 kg portakaldan kaç litre meyve suyu çıkar? (Doğru Orantı)`,
+                    text: `${a} metre kumaş ${b * 10} TL ise, 1 metre kumaş kaç TL'dir? (Doğru Orantı)`,
                     type: 'doğru orantı',
-                    options: [
-                        (b/a).toFixed(2),
-                        ((b/a) + 0.5).toFixed(2),
-                        ((b/a) * 2).toFixed(2),
-                        (a/b).toFixed(2)
-                    ],
-                    correct: (b/a).toFixed(2),
-                    solution: `${a} kg → ${b} litre ise, 1 kg → ${b} ÷ ${a} = ${(b/a).toFixed(2)} litre. (Doğru orantıda bölme işlemi yapılır)`
+                    correct: correct,
+                    solution: `${a} metre → ${b * 10} TL ise, 1 metre → ${b * 10} ÷ ${a} = ${correct} TL`
+                });
+            } else if (i % 3 === 1) {
+                // Ters orantı
+                const a = Math.floor(Math.random() * 4) + 3;
+                const b = Math.floor(Math.random() * 5) + 4;
+                const day = Math.floor(Math.random() * 6) + 6;
+                const correct = ((a * day) / b).toFixed(1);
+                questions.push({
+                    id: i,
+                    text: `${a} usta bir duvarı ${day} günde örüyor. Aynı duvarı ${b} usta kaç günde örer? (Ters Orantı)`,
+                    type: 'ters orantı',
+                    correct: correct,
+                    solution: `${a} usta × ${day} gün = ${a * day} iş. ${b} usta → ${a * day} ÷ ${b} = ${correct} gün`
                 });
             } else {
-                // Ters orantı soruları
-                const a = Math.floor(Math.random() * 5) + 3; // 3-8 arası
-                const b = Math.floor(Math.random() * 4) + 4; // 4-8 arası
-                const day = Math.floor(Math.random() * 5) + 8; // 8-13 arası
-                const result = ((a * day) / b).toFixed(2);
+                // Karışık orantı
+                const a = Math.floor(Math.random() * 6) + 2;
+                const b = Math.floor(Math.random() * 6) + 2;
+                const c = Math.floor(Math.random() * 4) + 3;
+                const correct = ((a * c) / b).toFixed(1);
                 questions.push({
                     id: i,
-                    text: `${a} işçi bir işi ${day} günde bitiriyor. Aynı işi ${b} işçi kaç günde bitirir? (Ters Orantı)`,
+                    text: `${a} işçi günde ${c} saat çalışarak bir işi 12 günde bitiriyor. Aynı işi ${b} işçi günde 8 saat çalışarak kaç günde bitirir? (Ters Orantı)`,
                     type: 'ters orantı',
-                    options: [
-                        result,
-                        (parseFloat(result) + 2).toFixed(2),
-                        (parseFloat(result) - 2).toFixed(2),
-                        (parseFloat(result) * 1.5).toFixed(2)
-                    ],
-                    correct: result,
-                    solution: `${a} işçi × ${day} gün = ${a * day} (toplam iş). ${b} işçi → ${a * day} ÷ ${b} = ${result} gün. (Ters orantıda çarpma sonra bölme yapılır)`
+                    correct: correct,
+                    solution: `${a}×${c}×12 = ${a * c * 12} (toplam iş). ${b}×8×x = ${a * c * 12} → x = ${correct}`
                 });
             }
         }
         
-        // Karıştır ve soru indeksleri
+        // Sorulara rastgele şıklar ekle
+        questions.forEach(q => {
+            const correct = parseFloat(q.correct);
+            const options = [
+                correct,
+                correct + (Math.random() * 3 + 1).toFixed(1),
+                correct - (Math.random() * 2 + 0.5).toFixed(1),
+                correct + (Math.random() * 5 + 2).toFixed(1)
+            ].map(Number).sort(() => Math.random() - 0.5); // Rastgele sırala
+            
+            q.options = options.map(opt => opt.toFixed(1));
+        });
+        
         let askedQuestions = new Set();
         let currentQuestion = null;
         let selectedOption = null;
         let showSolution = false;
         
-        // Asset yükleme
+        // Asset'ler
         const assets = {
             backgroundDay: new Image(),
             backgroundNight: new Image(),
@@ -293,11 +414,9 @@
             birdUp: new Image(),
             pipeGreen: new Image(),
             pipeRed: new Image(),
-            message: new Image(),
-            gameover: new Image()
+            message: new Image()
         };
         
-        // Asset yolları (doğru klasör yapısıyla)
         assets.backgroundDay.src = 'sprites/background-day.png';
         assets.backgroundNight.src = 'sprites/background-night.png';
         assets.base.src = 'sprites/base.png';
@@ -307,17 +426,7 @@
         assets.pipeGreen.src = 'sprites/pipe-green.png';
         assets.pipeRed.src = 'sprites/pipe-red.png';
         assets.message.src = 'sprites/message.png';
-        assets.gameover.src = 'sprites/gameover.png';
         
-        // Sesler (isteğe bağlı)
-        const sounds = {
-            die: new Audio('audio/die.ogg'),
-            hit: new Audio('audio/hit.ogg'),
-            point: new Audio('audio/point.ogg'),
-            wing: new Audio('audio/wing.ogg')
-        };
-        
-        // Bilgi mesajı
         function showInfo() {
             const msg = document.getElementById('infoMessage');
             msg.style.display = 'block';
@@ -326,30 +435,37 @@
             }, 2000);
         }
         
-        // Yeni soru yükle
         function loadNewQuestion() {
-            // Daha önce sorulmamış soru bul
-            const availableQuestions = questions.filter(q => !askedQuestions.has(q.id));
+            if (correctAnswered) {
+                // Doğru cevap verildiyse soru sorma
+                continueGame();
+                return;
+            }
             
-            if (availableQuestions.length === 0) {
-                // Tüm sorular bittiyse havuzu sıfırla
+            // Kalan sorular
+            const available = questions.filter(q => !askedQuestions.has(q.id));
+            
+            if (available.length === 0) {
                 askedQuestions.clear();
                 currentQuestion = questions[Math.floor(Math.random() * questions.length)];
             } else {
-                currentQuestion = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+                currentQuestion = available[Math.floor(Math.random() * available.length)];
             }
             
             askedQuestions.add(currentQuestion.id);
             
-            // Soruyu göster
-            document.getElementById('questionType').textContent = `Soru tipi: ${currentQuestion.type}`;
+            document.getElementById('questionType').textContent = `📐 ${currentQuestion.type.toUpperCase()}`;
+            document.getElementById('questionCount').textContent = `📊 ${askedQuestions.size}/100`;
             document.getElementById('questionText').textContent = currentQuestion.text;
             
-            // Şıkları oluştur
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
             
-            currentQuestion.options.forEach((opt, index) => {
+            // Şıkları karıştır ve göster
+            const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+            currentQuestion.options = shuffledOptions;
+            
+            shuffledOptions.forEach((opt, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.textContent = `${String.fromCharCode(65 + index)}) ${opt}`;
@@ -357,31 +473,34 @@
                 optionsContainer.appendChild(btn);
             });
             
-            // Çözüm ve butonları gizle
             document.getElementById('solutionText').style.display = 'none';
             document.getElementById('nextQuestionBtn').style.display = 'none';
-            document.getElementById('solutionText').innerHTML = '';
+            document.getElementById('continueBtn').style.display = 'none';
             
             selectedOption = null;
             showSolution = false;
             
-            // Panel'i göster
             document.getElementById('questionPanel').style.display = 'flex';
             questionMode = true;
             gameActive = false;
         }
         
-        // Şık seçimi
         function selectOption(index, value) {
-            if (showSolution) return; // Cevap verildiyse tekrar seçim yapılamaz
+            if (showSolution) return;
             
             selectedOption = index;
-            const isCorrect = (value == currentQuestion.correct);
+            const isCorrect = (parseFloat(value) === parseFloat(currentQuestion.correct));
             
-            // Şıkların stilini güncelle
             const optionBtns = document.querySelectorAll('.option-btn');
+            
+            // Doğru şıkkı bul ve işaretle
             optionBtns.forEach((btn, i) => {
-                btn.classList.remove('selected-correct', 'selected-wrong');
+                btn.classList.remove('selected-correct', 'selected-wrong', 'correct-highlight', 'wrong-highlight');
+                
+                if (parseFloat(currentQuestion.options[i]) === parseFloat(currentQuestion.correct)) {
+                    btn.classList.add('correct-highlight');
+                }
+                
                 if (i === index) {
                     if (isCorrect) {
                         btn.classList.add('selected-correct');
@@ -389,44 +508,56 @@
                         btn.classList.add('selected-wrong');
                     }
                 }
-                if (currentQuestion.options[i] == currentQuestion.correct) {
-                    btn.style.borderColor = '#00ff00';
-                }
             });
             
-            // Çözümü göster
             showSolution = true;
             const solutionDiv = document.getElementById('solutionText');
-            solutionDiv.innerHTML = currentQuestion.solution;
+            solutionDiv.innerHTML = `📝 ${currentQuestion.solution}`;
             solutionDiv.style.display = 'block';
             
-            // Başka soruya geç butonunu göster
-            document.getElementById('nextQuestionBtn').style.display = 'block';
+            if (isCorrect) {
+                correctAnswered = true;
+                document.getElementById('continueBtn').style.display = 'block';
+                document.getElementById('nextQuestionBtn').style.display = 'none';
+                
+                // Doğru cevapta hemen oyuna dönebiliriz
+                setTimeout(() => {
+                    if (questionMode) continueGame();
+                }, 1500);
+            } else {
+                correctAnswered = false;
+                document.getElementById('nextQuestionBtn').style.display = 'block';
+                document.getElementById('continueBtn').style.display = 'none';
+            }
         }
         
-        // Oyunu sıfırla
+        function continueGame() {
+            document.getElementById('questionPanel').style.display = 'none';
+            questionMode = false;
+            gameActive = true;
+        }
+        
         function resetGame() {
-            bird.y = 200;
+            bird.y = 250;
             bird.velocity = 0;
             pipes = [];
             score = 0;
             frameCount = 0;
             nightMode = false;
             baseX = 0;
+            correctAnswered = false;
             document.getElementById('score').textContent = '0';
             gameActive = true;
             questionMode = false;
             document.getElementById('questionPanel').style.display = 'none';
         }
         
-        // Oyun bitti
         function gameOver() {
             gameActive = false;
-            try { sounds.die.play(); } catch(e) {}
-            loadNewQuestion(); // Ölünce soru sor
+            correctAnswered = false; // Yeni ölümde soru sor
+            loadNewQuestion();
         }
         
-        // Oyun döngüsü
         function update() {
             if (!gameActive || questionMode) return;
             
@@ -437,10 +568,10 @@
             // Kuş animasyonu
             bird.frame = (bird.frame + 1) % 30;
             
-            // Boru oluşturma
+            // Boru oluşturma (daha seyrek)
             frameCount++;
-            if (frameCount % 90 === 0) {
-                const pipeY = Math.random() * -200;
+            if (frameCount % 100 === 0) {
+                const pipeY = Math.random() * -180;
                 pipes.push({
                     x: canvas.width,
                     y: pipeY,
@@ -450,36 +581,30 @@
             
             // Boruları hareket ettir
             for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 2;
+                pipes[i].x -= 2.5;
                 
-                // Skor kontrolü
                 if (!pipes[i].passed && pipes[i].x + PIPE_WIDTH < bird.x) {
                     pipes[i].passed = true;
                     score++;
                     document.getElementById('score').textContent = score;
-                    try { sounds.point.play(); } catch(e) {}
                     
-                    // Her 5 puanda bir gece/gündüz değiş
                     if (score % 5 === 0) {
                         nightMode = !nightMode;
                     }
                 }
                 
-                // Boruyu sil
                 if (pipes[i].x + PIPE_WIDTH < 0) {
                     pipes.splice(i, 1);
                 }
             }
             
-            // Base animasyonu
             baseX = (baseX - 2) % 336;
             
-            // Çarpışma kontrolü
+            // Çarpışma
             if (bird.y + bird.height >= canvas.height - 112 || bird.y <= 0) {
                 gameOver();
             }
             
-            // Boru çarpışması
             for (let pipe of pipes) {
                 // Üst boru
                 if (bird.x < pipe.x + PIPE_WIDTH &&
@@ -499,40 +624,25 @@
             }
         }
         
-        // Çizim
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Arkaplan
-            if (nightMode) {
-                ctx.drawImage(assets.backgroundNight, 0, 0, 288, 512);
-            } else {
-                ctx.drawImage(assets.backgroundDay, 0, 0, 288, 512);
-            }
+            ctx.drawImage(nightMode ? assets.backgroundNight : assets.backgroundDay, 0, 0, 288, 512);
             
             // Borular
             for (let pipe of pipes) {
-                if (nightMode) {
-                    // Üst boru (ters çizim)
-                    ctx.save();
-                    ctx.translate(pipe.x + PIPE_WIDTH/2, pipe.y + 160);
-                    ctx.scale(1, -1);
-                    ctx.drawImage(assets.pipeRed, -PIPE_WIDTH/2, -160, PIPE_WIDTH, 320);
-                    ctx.restore();
-                    
-                    // Alt boru
-                    ctx.drawImage(assets.pipeRed, pipe.x, pipe.y + 320 + PIPE_GAP, PIPE_WIDTH, 320);
-                } else {
-                    // Üst boru (ters çizim)
-                    ctx.save();
-                    ctx.translate(pipe.x + PIPE_WIDTH/2, pipe.y + 160);
-                    ctx.scale(1, -1);
-                    ctx.drawImage(assets.pipeGreen, -PIPE_WIDTH/2, -160, PIPE_WIDTH, 320);
-                    ctx.restore();
-                    
-                    // Alt boru
-                    ctx.drawImage(assets.pipeGreen, pipe.x, pipe.y + 320 + PIPE_GAP, PIPE_WIDTH, 320);
-                }
+                const pipeImg = nightMode ? assets.pipeRed : assets.pipeGreen;
+                
+                // Üst boru (ters)
+                ctx.save();
+                ctx.translate(pipe.x + PIPE_WIDTH/2, pipe.y + 160);
+                ctx.scale(1, -1);
+                ctx.drawImage(pipeImg, -PIPE_WIDTH/2, -160, PIPE_WIDTH, 320);
+                ctx.restore();
+                
+                // Alt boru
+                ctx.drawImage(pipeImg, pipe.x, pipe.y + 320 + PIPE_GAP, PIPE_WIDTH, 320);
             }
             
             // Base
@@ -545,10 +655,9 @@
             else if (bird.frame < 20) birdImage = assets.birdMid;
             else birdImage = assets.birdUp;
             
-            // Kuş rotasyonu (hıza göre)
             ctx.save();
             ctx.translate(bird.x + bird.width/2, bird.y + bird.height/2);
-            ctx.rotate(Math.min(Math.max(bird.velocity * 0.05, -0.5), 0.5));
+            ctx.rotate(Math.min(Math.max(bird.velocity * 0.03, -0.4), 0.4));
             ctx.drawImage(birdImage, -bird.width/2, -bird.height/2, bird.width, bird.height);
             ctx.restore();
             
@@ -556,27 +665,27 @@
             if (!gameActive && !questionMode) {
                 ctx.drawImage(assets.message, 52, 150, 184, 267);
                 ctx.fillStyle = 'white';
-                ctx.font = 'bold 12px Arial';
+                ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('Başlamak için tıkla', canvas.width/2, canvas.height - 150);
+                ctx.fillText('Dokun ve Başla', canvas.width/2, canvas.height - 100);
             }
         }
         
-        // Oyun döngüsü
         function gameLoop() {
             update();
             draw();
             requestAnimationFrame(gameLoop);
         }
         
-        // Tıklama olayları
+        // Sadece tıklama ile zıplama (swipe kapalı)
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
             
-            // İnfo butonu kontrolü
-            if (x < 30 && y < 30) {
+            if (x < 50 && y < 50) {
                 showInfo();
                 return;
             }
@@ -584,30 +693,40 @@
             if (!gameActive && !questionMode) {
                 resetGame();
             } else if (gameActive && !questionMode) {
-                // Zıplama
                 bird.velocity = bird.jump;
-                try { sounds.wing.play(); } catch(e) {}
             }
         });
         
-        // Soru panelini kapat (oyuna dön)
+        // Touch event'i de sadece tıklama gibi çalışsın
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const x = (touch.clientX - rect.left) * scaleX;
+            const y = (touch.clientY - rect.top) * scaleY;
+            
+            if (x < 50 && y < 50) {
+                showInfo();
+                return;
+            }
+            
+            if (!gameActive && !questionMode) {
+                resetGame();
+            } else if (gameActive && !questionMode) {
+                bird.velocity = bird.jump;
+            }
+        }, { passive: false });
+        
+        // ESC ile sorudan çık
         document.addEventListener('keydown', (e) => {
             if (e.code === 'Escape' && questionMode) {
-                document.getElementById('questionPanel').style.display = 'none';
-                questionMode = false;
-                gameActive = true;
+                continueGame();
             }
         });
         
-        // Oyunu başlat
         gameLoop();
-        
-        // Asset yükleme hatası kontrolü
-        for (let key in assets) {
-            assets[key].onerror = () => {
-                console.warn(`${key} yüklenemedi. Lütfen assets klasörünü kontrol edin.`);
-            };
-        }
     </script>
 </body>
-  </html>
+</html>
