@@ -34,15 +34,17 @@
         }
 
         #gameCanvas {
-            width: min(100vh * 0.5625, 100vw); /* 16:9 oranı */
-            height: min(100vw * 1.777, 100vh);
-            max-width: 100%;
-            max-height: 100%;
+            width: min(85vh * 0.5625, 85vw);
+            height: min(85vw * 1.777, 85vh);
+            max-width: 85%;
+            max-height: 85%;
             object-fit: contain;
             image-rendering: crisp-edges;
             image-rendering: pixelated;
             touch-action: none;
             background: #000;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8), 0 0 0 2px #ffd70033;
         }
 
         #infoBtn {
@@ -107,23 +109,27 @@
 
         #questionPanel {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: min(90%, 450px);
+            max-height: 85vh;
             background: linear-gradient(145deg, #1a2f3f, #0f1a24);
-            z-index: 20;
+            z-index: 100;
             display: none;
             flex-direction: column;
-            padding: min(25px, 5vh) min(20px, 4vw);
+            padding: min(30px, 5vh) min(25px, 4vw);
             color: white;
             overflow-y: auto;
             animation: fadeIn 0.3s;
+            border-radius: 30px;
+            border: 3px solid #ffd700;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px #ffd70033;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
         }
 
         #questionHeader {
@@ -153,10 +159,10 @@
         }
 
         #questionText {
-            font-size: min(20px, 5vh, 4vw);
+            font-size: min(18px, 4.5vh, 4vw);
             line-height: 1.5;
-            margin-bottom: min(25px, 5vh);
-            padding: min(20px, 4vh);
+            margin-bottom: min(20px, 4vh);
+            padding: min(15px, 3vh);
             background: rgba(255,255,255,0.08);
             border-radius: 15px;
             border-left: 5px solid #ffd700;
@@ -167,17 +173,17 @@
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: min(15px, 3vh);
-            margin: min(15px, 3vh) 0 min(25px, 5vh);
+            gap: min(12px, 2.5vh);
+            margin: min(10px, 2vh) 0 min(20px, 4vh);
         }
 
         .option-btn {
             background: rgba(255,255,255,0.1);
             border: 2px solid rgba(255,255,255,0.15);
             color: white;
-            padding: min(18px, 3.5vh) min(20px, 4vw);
+            padding: min(15px, 3vh) min(18px, 3.5vw);
             border-radius: 50px;
-            font-size: min(20px, 4.5vh, 4vw);
+            font-size: min(18px, 4vh, 3.5vw);
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -201,6 +207,7 @@
             background: linear-gradient(145deg, #27ae60, #2ecc71);
             border-color: #fff;
             transform: scale(1.02);
+            box-shadow: 0 0 20px #2ecc71;
         }
 
         .option-btn.selected-wrong {
@@ -209,12 +216,12 @@
         }
 
         #solutionText {
-            margin: min(15px, 3vh) 0;
-            padding: min(20px, 4vh);
+            margin: min(12px, 2.5vh) 0;
+            padding: min(15px, 3vh);
             background: rgba(52, 152, 219, 0.2);
             border-left: 5px solid #3498db;
             border-radius: 10px;
-            font-size: min(16px, 4vh);
+            font-size: min(15px, 3.5vh);
             line-height: 1.6;
             display: none;
             backdrop-filter: blur(5px);
@@ -227,12 +234,12 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        #nextQuestionBtn, #continueBtn {
-            margin-top: min(15px, 3vh);
-            padding: min(18px, 3.5vh);
+        #nextQuestionBtn, #continueBtn, #startGameBtn {
+            margin-top: min(12px, 2.5vh);
+            padding: min(15px, 3vh);
             border: none;
             border-radius: 50px;
-            font-size: min(18px, 4vh);
+            font-size: min(16px, 3.5vh);
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -252,17 +259,51 @@
             color: white;
         }
 
-        #nextQuestionBtn:active, #continueBtn:active {
+        #startGameBtn {
+            background: linear-gradient(145deg, #3498db, #2980b9);
+            color: white;
+            display: block;
+            font-size: min(18px, 4vh);
+            border: 2px solid #ffd700;
+        }
+
+        #nextQuestionBtn:active, #continueBtn:active, #startGameBtn:active {
             transform: scale(0.95);
+        }
+
+        #gameoverScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 50;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #gameoverImage {
+            width: min(80%, 300px);
+            image-rendering: pixelated;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
 
         /* Mobil uyumluluk */
         @media (orientation: landscape) {
             #questionText {
-                font-size: min(18px, 4vh);
+                font-size: min(16px, 3.5vh);
             }
             .option-btn {
-                padding: min(12px, 3vh);
+                padding: min(10px, 2.5vh);
             }
         }
     </style>
@@ -274,6 +315,10 @@
         <div id="infoMessage">OmerAsaf tarafından geliştirildi</div>
         <div id="score">0</div>
         
+        <div id="gameoverScreen">
+            <img id="gameoverImage" src="sprites/gameover.png" alt="Game Over">
+        </div>
+        
         <div id="questionPanel">
             <div id="questionHeader">
                 <span id="questionType"></span>
@@ -284,6 +329,7 @@
             <div id="solutionText"></div>
             <button id="nextQuestionBtn" onclick="loadNewQuestion()">Başka Soruya Geç →</button>
             <button id="continueBtn" onclick="continueGame()">Oyuna Dön →</button>
+            <button id="startGameBtn" onclick="startGameFromQuestion()">Oyuna Başla!</button>
         </div>
     </div>
 
@@ -292,10 +338,13 @@
         const ctx = canvas.getContext('2d');
         
         // Oyun değişkenleri
-        let gameActive = true;
-        let questionMode = false;
+        let gameActive = false;
+        let questionMode = true; // Başlangıçta soru paneli açık
         let score = 0;
         let correctAnswered = false;
+        let waitingForStart = true; // İlk başlama için soru bekliyor
+        let gameoverVisible = false;
+        
         let bird = {
             x: 60,
             y: 250,
@@ -314,11 +363,10 @@
         let nightMode = false;
         let baseX = 0;
         
-        // Soru havuzu (100 soru - NaN hatası yok!)
+        // Soru havuzu (100 soru)
         const questions = [];
         for (let i = 1; i <= 100; i++) {
             if (i % 3 === 0) {
-                // Doğru orantı
                 const a = Math.floor(Math.random() * 5) + 2;
                 const b = Math.floor(Math.random() * 5) + 3;
                 const correct = ((b * 10) / a).toFixed(1);
@@ -330,7 +378,6 @@
                     solution: `${a} metre → ${b * 10} TL ise, 1 metre → ${b * 10} ÷ ${a} = ${correct} TL`
                 });
             } else if (i % 3 === 1) {
-                // Ters orantı
                 const a = Math.floor(Math.random() * 4) + 3;
                 const b = Math.floor(Math.random() * 4) + 4;
                 const day = Math.floor(Math.random() * 6) + 6;
@@ -343,13 +390,11 @@
                     solution: `${a} usta × ${day} gün = ${a * day} iş. ${b} usta → ${a * day} ÷ ${b} = ${correct} gün`
                 });
             } else {
-                // Karışık orantı (işçi-saat)
-                const a = Math.floor(Math.random() * 4) + 3; // işçi sayısı
-                const b = Math.floor(Math.random() * 3) + 4; // saat
-                const gun1 = 12; // sabit
-                const c = Math.floor(Math.random() * 3) + 4; // yeni işçi
-                const saat2 = 8; // sabit
-                // Ters orantı: işçi * saat * gün = sabit
+                const a = Math.floor(Math.random() * 4) + 3;
+                const b = Math.floor(Math.random() * 3) + 4;
+                const gun1 = 12;
+                const c = Math.floor(Math.random() * 3) + 4;
+                const saat2 = 8;
                 const sabit = a * b * gun1;
                 const correct = (sabit / (c * saat2)).toFixed(1);
                 questions.push({
@@ -362,16 +407,14 @@
             }
         }
         
-        // Sorulara rastgele şıklar ekle (NaN yok!)
+        // Sorulara rastgele şıklar ekle
         questions.forEach(q => {
             const correct = parseFloat(q.correct);
-            // Rastgele 3 yanlış şık oluştur (sayısal değerler)
             const wrong1 = (correct + (Math.random() * 2 + 0.5)).toFixed(1);
             const wrong2 = (correct - (Math.random() * 1.5 + 0.2)).toFixed(1);
             const wrong3 = (correct + (Math.random() * 3 + 1)).toFixed(1);
             
             let options = [correct.toString(), wrong1, wrong2, wrong3];
-            // Karıştır
             options = options.sort(() => Math.random() - 0.5);
             q.options = options;
         });
@@ -390,7 +433,6 @@
             wing: new Audio()
         };
         
-        // Ses dosyalarını yükle (Base64 ile değil, doğrudan dosyadan)
         function loadSounds() {
             try {
                 sounds.die.src = 'audio/die.ogg';
@@ -398,7 +440,6 @@
                 sounds.point.src = 'audio/point.ogg';
                 sounds.wing.src = 'audio/wing.ogg';
                 
-                // Seslerin yüklenmesini bekle
                 Object.values(sounds).forEach(sound => {
                     sound.load();
                     sound.volume = 0.5;
@@ -419,10 +460,10 @@
             birdUp: new Image(),
             pipeGreen: new Image(),
             pipeRed: new Image(),
-            message: new Image()
+            message: new Image(),
+            gameover: new Image()
         };
         
-        // Asset yolları
         assets.backgroundDay.src = 'sprites/background-day.png';
         assets.backgroundNight.src = 'sprites/background-night.png';
         assets.base.src = 'sprites/base.png';
@@ -432,6 +473,12 @@
         assets.pipeGreen.src = 'sprites/pipe-green.png';
         assets.pipeRed.src = 'sprites/pipe-red.png';
         assets.message.src = 'sprites/message.png';
+        assets.gameover.src = 'sprites/gameover.png';
+        
+        // Gameover image yüklendiğinde
+        assets.gameover.onload = () => {
+            document.getElementById('gameoverImage').src = assets.gameover.src;
+        };
         
         function showInfo() {
             const msg = document.getElementById('infoMessage');
@@ -442,17 +489,6 @@
         }
         
         function loadNewQuestion() {
-            // Ölünce soru havuzunu sıfırla (yeni oyun için)
-            if (!gameActive && !questionMode) {
-                askedQuestions.clear();
-            }
-            
-            // Eğer doğru cevap verildiyse ve ölmediysek soru sorma
-            if (correctAnswered && gameActive) {
-                continueGame();
-                return;
-            }
-            
             // Kalan sorular
             const available = questions.filter(q => !askedQuestions.has(q.id));
             
@@ -472,7 +508,6 @@
             const optionsContainer = document.getElementById('optionsContainer');
             optionsContainer.innerHTML = '';
             
-            // Şıkları göster
             currentQuestion.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
                 btn.className = 'option-btn';
@@ -485,12 +520,21 @@
             document.getElementById('nextQuestionBtn').style.display = 'none';
             document.getElementById('continueBtn').style.display = 'none';
             
+            // Eğer bekliyorsak (ilk başlama veya ölüm sonrası), start butonunu göster
+            if (waitingForStart) {
+                document.getElementById('startGameBtn').style.display = 'block';
+            } else {
+                document.getElementById('startGameBtn').style.display = 'none';
+            }
+            
             selectedOption = null;
             showSolution = false;
             
             document.getElementById('questionPanel').style.display = 'flex';
             questionMode = true;
             gameActive = false;
+            gameoverVisible = false;
+            document.getElementById('gameoverScreen').style.display = 'none';
         }
         
         function selectOption(index, value) {
@@ -501,7 +545,6 @@
             
             const optionBtns = document.querySelectorAll('.option-btn');
             
-            // Doğru şıkkı bul ve işaretle
             optionBtns.forEach((btn, i) => {
                 btn.classList.remove('selected-correct', 'selected-wrong', 'correct-highlight');
                 
@@ -525,21 +568,30 @@
             
             if (isCorrect) {
                 correctAnswered = true;
-                document.getElementById('continueBtn').style.display = 'block';
-                document.getElementById('nextQuestionBtn').style.display = 'none';
                 
-                // Doğru cevapta ses çal
+                // Eğer bekliyorsak (ilk başlama veya ölüm sonrası), doğru cevapta start butonu aktif
+                if (waitingForStart) {
+                    document.getElementById('startGameBtn').style.display = 'block';
+                    document.getElementById('nextQuestionBtn').style.display = 'none';
+                    document.getElementById('continueBtn').style.display = 'none';
+                } else {
+                    document.getElementById('continueBtn').style.display = 'block';
+                    document.getElementById('nextQuestionBtn').style.display = 'none';
+                }
+                
                 try { sounds.point.play(); } catch(e) {}
                 
-                // 1.5 saniye sonra oyuna dön
-                setTimeout(() => {
-                    if (questionMode) continueGame();
-                }, 1500);
+                // Oyun içinde doğru cevap verdiyse 1.5 saniye sonra oyuna dön
+                if (!waitingForStart) {
+                    setTimeout(() => {
+                        if (questionMode && !waitingForStart) continueGame();
+                    }, 1500);
+                }
             } else {
                 correctAnswered = false;
                 document.getElementById('nextQuestionBtn').style.display = 'block';
                 document.getElementById('continueBtn').style.display = 'none';
-                // Yanlış cevapta hit sesi
+                document.getElementById('startGameBtn').style.display = 'none';
                 try { sounds.hit.play(); } catch(e) {}
             }
         }
@@ -548,9 +600,23 @@
             document.getElementById('questionPanel').style.display = 'none';
             questionMode = false;
             gameActive = true;
+            waitingForStart = false;
         }
         
-        function resetGame() {
+        function startGameFromQuestion() {
+            if (correctAnswered || waitingForStart) {
+                // Doğru cevap verdiyse veya ilk başlangıçsa oyunu başlat
+                document.getElementById('questionPanel').style.display = 'none';
+                questionMode = false;
+                gameActive = true;
+                waitingForStart = false;
+                
+                // Oyunu sıfırla
+                reset();
+            }
+        }
+        
+        function reset() {
             bird.y = 250;
             bird.velocity = 0;
             pipes = [];
@@ -560,23 +626,26 @@
             baseX = 0;
             correctAnswered = false;
             document.getElementById('score').textContent = '0';
-            gameActive = true;
-            questionMode = false;
-            document.getElementById('questionPanel').style.display = 'none';
-            
-            // Soru havuzunu sıfırla
-            askedQuestions.clear();
         }
         
         function gameOver() {
             gameActive = false;
             correctAnswered = false;
+            waitingForStart = true; // Bir sonraki başlangıç için soru bekle
             
-            // Die sesi çal
             try { sounds.die.play(); } catch(e) {}
             
-            // Ölünce soru sor (havuz sıfırlanacak)
-            loadNewQuestion();
+            // Gameover resmini göster
+            gameoverVisible = true;
+            document.getElementById('gameoverScreen').style.display = 'flex';
+            
+            // 2 saniye sonra soru panelini aç
+            setTimeout(() => {
+                if (gameoverVisible) {
+                    document.getElementById('gameoverScreen').style.display = 'none';
+                    loadNewQuestion(); // Yeni soru ile başlamak için
+                }
+            }, 2000);
         }
         
         function update() {
@@ -609,7 +678,6 @@
                     score++;
                     document.getElementById('score').textContent = score;
                     
-                    // Point sesi
                     try { sounds.point.play(); } catch(e) {}
                     
                     if (score % 5 === 0) {
@@ -688,13 +756,14 @@
             ctx.drawImage(birdImage, -bird.width/2, -bird.height/2, bird.width, bird.height);
             ctx.restore();
             
-            // Başlangıç mesajı
-            if (!gameActive && !questionMode) {
-                ctx.drawImage(assets.message, 52, 150, 184, 267);
+            // Başlangıç mesajı (sadece hiç oyun başlamadıysa)
+            if (!gameActive && !questionMode && !gameoverVisible && waitingForStart) {
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = 'white';
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('Dokun ve Başla', canvas.width/2, canvas.height - 100);
+                ctx.fillText('Önce soru çözmelisin!', canvas.width/2, 200);
             }
         }
         
@@ -717,11 +786,9 @@
                 return;
             }
             
-            if (!gameActive && !questionMode) {
-                resetGame();
-            } else if (gameActive && !questionMode) {
+            if (gameActive && !questionMode) {
                 bird.velocity = bird.jump;
-                try { sounds.wing.play(); } catch(e) {} // Kanat sesi
+                try { sounds.wing.play(); } catch(e) {}
             }
         });
         
@@ -740,20 +807,25 @@
                 return;
             }
             
-            if (!gameActive && !questionMode) {
-                resetGame();
-            } else if (gameActive && !questionMode) {
+            if (gameActive && !questionMode) {
                 bird.velocity = bird.jump;
                 try { sounds.wing.play(); } catch(e) {}
             }
         }, { passive: false });
         
-        // ESC ile sorudan çık
+        // ESC ile sorudan çıkma (sadece oyun içinde)
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Escape' && questionMode) {
+            if (e.code === 'Escape' && questionMode && !waitingForStart) {
                 continueGame();
             }
         });
+        
+        // Oyunu başlat - ilk soruyu yükle
+        window.onload = () => {
+            setTimeout(() => {
+                loadNewQuestion(); // İlk soru
+            }, 500);
+        };
         
         gameLoop();
     </script>
