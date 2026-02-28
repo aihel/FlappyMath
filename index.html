@@ -34,29 +34,25 @@
         }
 
         #gameCanvas {
-            width: min(85vh * 0.5625, 85vw);
-            height: min(85vw * 1.777, 85vh);
-            max-width: 85%;
-            max-height: 85%;
-            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* Taşsın, uzasın, esnesin! */
             image-rendering: crisp-edges;
             image-rendering: pixelated;
             touch-action: none;
             background: #000;
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8), 0 0 0 2px #ffd70033;
         }
 
         #infoBtn {
             position: absolute;
-            top: max(15px, 3vh);
-            left: max(15px, 3vw);
-            width: min(50px, 8vh, 8vw);
-            height: min(50px, 8vh, 8vw);
+            top: 15px;
+            left: 15px;
+            width: 44px;
+            height: 44px;
             background: rgba(255,255,255,0.95);
             border: 3px solid #333;
             border-radius: 50%;
-            font-size: min(28px, 5vh, 5vw);
+            font-size: 24px;
             font-weight: bold;
             color: #333;
             cursor: pointer;
@@ -75,13 +71,13 @@
 
         #infoMessage {
             position: absolute;
-            top: max(70px, 8vh);
-            left: max(15px, 3vw);
+            top: 70px;
+            left: 15px;
             background: rgba(0,0,0,0.85);
             color: #ffd700;
             padding: 12px 20px;
             border-radius: 30px;
-            font-size: min(16px, 4vh);
+            font-size: 16px;
             font-weight: bold;
             z-index: 25;
             display: none;
@@ -97,10 +93,10 @@
 
         #score {
             position: absolute;
-            top: max(15px, 3vh);
-            right: max(20px, 4vw);
+            top: 15px;
+            right: 20px;
             color: white;
-            font-size: min(48px, 8vh, 8vw);
+            font-size: 48px;
             font-weight: bold;
             text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(0,0,0,0.5);
             z-index: 5;
@@ -112,19 +108,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(90%, 450px);
-            max-height: 85vh;
+            width: min(90%, 500px);
+            max-height: 90vh;
             background: linear-gradient(145deg, #1a2f3f, #0f1a24);
             z-index: 100;
             display: none;
             flex-direction: column;
-            padding: min(30px, 5vh) min(25px, 4vw);
+            padding: 30px 25px;
             color: white;
             overflow-y: auto;
             animation: fadeIn 0.3s;
             border-radius: 30px;
-            border: 3px solid #ffd700;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px #ffd70033;
+            border: 4px solid #ffd700;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 40px #ffd70066;
         }
 
         @keyframes fadeIn {
@@ -136,15 +132,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: min(20px, 4vh);
+            margin-bottom: 20px;
         }
 
         #questionType {
             background: #ffd700;
             color: #1a2f3f;
-            padding: min(8px, 2vh) min(16px, 3vw);
+            padding: 8px 16px;
             border-radius: 30px;
-            font-size: min(16px, 4vh);
+            font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -152,17 +148,17 @@
 
         #questionCount {
             background: rgba(255,255,255,0.15);
-            padding: min(8px, 2vh) min(16px, 3vw);
+            padding: 8px 16px;
             border-radius: 30px;
-            font-size: min(14px, 3.5vh);
+            font-size: 14px;
             border: 1px solid rgba(255,255,255,0.2);
         }
 
         #questionText {
-            font-size: min(18px, 4.5vh, 4vw);
+            font-size: 20px;
             line-height: 1.5;
-            margin-bottom: min(20px, 4vh);
-            padding: min(15px, 3vh);
+            margin-bottom: 25px;
+            padding: 20px;
             background: rgba(255,255,255,0.08);
             border-radius: 15px;
             border-left: 5px solid #ffd700;
@@ -173,17 +169,17 @@
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: min(12px, 2.5vh);
-            margin: min(10px, 2vh) 0 min(20px, 4vh);
+            gap: 15px;
+            margin: 15px 0 25px;
         }
 
         .option-btn {
             background: rgba(255,255,255,0.1);
             border: 2px solid rgba(255,255,255,0.15);
             color: white;
-            padding: min(15px, 3vh) min(18px, 3.5vw);
+            padding: 18px 20px;
             border-radius: 50px;
-            font-size: min(18px, 4vh, 3.5vw);
+            font-size: 20px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -216,12 +212,12 @@
         }
 
         #solutionText {
-            margin: min(12px, 2.5vh) 0;
-            padding: min(15px, 3vh);
+            margin: 15px 0;
+            padding: 20px;
             background: rgba(52, 152, 219, 0.2);
             border-left: 5px solid #3498db;
             border-radius: 10px;
-            font-size: min(15px, 3.5vh);
+            font-size: 16px;
             line-height: 1.6;
             display: none;
             backdrop-filter: blur(5px);
@@ -235,11 +231,11 @@
         }
 
         #nextQuestionBtn, #continueBtn, #startGameBtn {
-            margin-top: min(12px, 2.5vh);
-            padding: min(15px, 3vh);
+            margin-top: 12px;
+            padding: 18px;
             border: none;
             border-radius: 50px;
-            font-size: min(16px, 3.5vh);
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -262,12 +258,21 @@
         #startGameBtn {
             background: linear-gradient(145deg, #3498db, #2980b9);
             color: white;
-            display: block;
-            font-size: min(18px, 4vh);
-            border: 2px solid #ffd700;
+            font-size: 20px;
+            border: 3px solid #ffd700;
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        #nextQuestionBtn:active, #continueBtn:active, #startGameBtn:active {
+        #startGameBtn.active {
+            opacity: 1;
+            cursor: pointer;
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            border-color: #fff;
+            box-shadow: 0 0 20px #2ecc71;
+        }
+
+        #nextQuestionBtn:active, #continueBtn:active, #startGameBtn.active:active {
             transform: scale(0.95);
         }
 
@@ -286,7 +291,7 @@
         }
 
         #gameoverImage {
-            width: min(80%, 300px);
+            width: min(80%, 400px);
             image-rendering: pixelated;
             animation: pulse 2s infinite;
         }
@@ -295,16 +300,6 @@
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
-        }
-
-        /* Mobil uyumluluk */
-        @media (orientation: landscape) {
-            #questionText {
-                font-size: min(16px, 3.5vh);
-            }
-            .option-btn {
-                padding: min(10px, 2.5vh);
-            }
         }
     </style>
 </head>
@@ -339,11 +334,19 @@
         
         // Oyun değişkenleri
         let gameActive = false;
-        let questionMode = true; // Başlangıçta soru paneli açık
+        let questionMode = true;
         let score = 0;
         let correctAnswered = false;
-        let waitingForStart = true; // İlk başlama için soru bekliyor
+        let waitingForStart = true;
         let gameoverVisible = false;
+        
+        // Oyun alanı her zaman tam ekran uzasın diye sabit değerler
+        const GAME_WIDTH = 288;
+        const GAME_HEIGHT = 512;
+        
+        // Ölçek faktörleri
+        let scaleX = 1;
+        let scaleY = 1;
         
         let bird = {
             x: 60,
@@ -475,7 +478,6 @@
         assets.message.src = 'sprites/message.png';
         assets.gameover.src = 'sprites/gameover.png';
         
-        // Gameover image yüklendiğinde
         assets.gameover.onload = () => {
             document.getElementById('gameoverImage').src = assets.gameover.src;
         };
@@ -489,7 +491,6 @@
         }
         
         function loadNewQuestion() {
-            // Kalan sorular
             const available = questions.filter(q => !askedQuestions.has(q.id));
             
             if (available.length === 0) {
@@ -520,12 +521,11 @@
             document.getElementById('nextQuestionBtn').style.display = 'none';
             document.getElementById('continueBtn').style.display = 'none';
             
-            // Eğer bekliyorsak (ilk başlama veya ölüm sonrası), start butonunu göster
-            if (waitingForStart) {
-                document.getElementById('startGameBtn').style.display = 'block';
-            } else {
-                document.getElementById('startGameBtn').style.display = 'none';
-            }
+            // Start butonunu güncelle
+            const startBtn = document.getElementById('startGameBtn');
+            startBtn.style.display = 'block';
+            startBtn.classList.remove('active');
+            startBtn.textContent = 'Oyuna Başla! (Önce soruyu doğru cevapla)';
             
             selectedOption = null;
             showSolution = false;
@@ -566,32 +566,25 @@
             solutionDiv.innerHTML = `📝 ${currentQuestion.solution}`;
             solutionDiv.style.display = 'block';
             
+            const startBtn = document.getElementById('startGameBtn');
+            
             if (isCorrect) {
                 correctAnswered = true;
                 
-                // Eğer bekliyorsak (ilk başlama veya ölüm sonrası), doğru cevapta start butonu aktif
-                if (waitingForStart) {
-                    document.getElementById('startGameBtn').style.display = 'block';
-                    document.getElementById('nextQuestionBtn').style.display = 'none';
-                    document.getElementById('continueBtn').style.display = 'none';
-                } else {
-                    document.getElementById('continueBtn').style.display = 'block';
-                    document.getElementById('nextQuestionBtn').style.display = 'none';
-                }
+                // Start butonunu aktif et
+                startBtn.classList.add('active');
+                startBtn.textContent = '🚀 Oyuna Başla!';
                 
                 try { sounds.point.play(); } catch(e) {}
-                
-                // Oyun içinde doğru cevap verdiyse 1.5 saniye sonra oyuna dön
-                if (!waitingForStart) {
-                    setTimeout(() => {
-                        if (questionMode && !waitingForStart) continueGame();
-                    }, 1500);
-                }
             } else {
                 correctAnswered = false;
                 document.getElementById('nextQuestionBtn').style.display = 'block';
                 document.getElementById('continueBtn').style.display = 'none';
-                document.getElementById('startGameBtn').style.display = 'none';
+                
+                // Start butonunu pasif yap
+                startBtn.classList.remove('active');
+                startBtn.textContent = 'Oyuna Başla! (Önce soruyu doğru cevapla)';
+                
                 try { sounds.hit.play(); } catch(e) {}
             }
         }
@@ -604,8 +597,8 @@
         }
         
         function startGameFromQuestion() {
-            if (correctAnswered || waitingForStart) {
-                // Doğru cevap verdiyse veya ilk başlangıçsa oyunu başlat
+            // Sadece doğru cevaplanmışsa başlasın
+            if (correctAnswered) {
                 document.getElementById('questionPanel').style.display = 'none';
                 questionMode = false;
                 gameActive = true;
@@ -631,19 +624,17 @@
         function gameOver() {
             gameActive = false;
             correctAnswered = false;
-            waitingForStart = true; // Bir sonraki başlangıç için soru bekle
+            waitingForStart = true;
             
             try { sounds.die.play(); } catch(e) {}
             
-            // Gameover resmini göster
             gameoverVisible = true;
             document.getElementById('gameoverScreen').style.display = 'flex';
             
-            // 2 saniye sonra soru panelini aç
             setTimeout(() => {
                 if (gameoverVisible) {
                     document.getElementById('gameoverScreen').style.display = 'none';
-                    loadNewQuestion(); // Yeni soru ile başlamak için
+                    loadNewQuestion();
                 }
             }, 2000);
         }
@@ -651,7 +642,7 @@
         function update() {
             if (!gameActive || questionMode) return;
             
-            // Kuş fiziği
+            // Kuş fiziği (orijinal koordinatlarda)
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
             
@@ -663,7 +654,7 @@
             if (frameCount % 100 === 0) {
                 const pipeY = Math.random() * -180;
                 pipes.push({
-                    x: canvas.width,
+                    x: GAME_WIDTH,
                     y: pipeY,
                     passed: false
                 });
@@ -692,8 +683,8 @@
             
             baseX = (baseX - 2) % 336;
             
-            // Çarpışma
-            if (bird.y + bird.height >= canvas.height - 112 || bird.y <= 0) {
+            // Çarpışma (orijinal koordinatlarda)
+            if (bird.y + bird.height >= GAME_HEIGHT - 112 || bird.y <= 0) {
                 gameOver();
                 return;
             }
@@ -720,10 +711,10 @@
         }
         
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
             
-            // Arkaplan
-            ctx.drawImage(nightMode ? assets.backgroundNight : assets.backgroundDay, 0, 0, 288, 512);
+            // Arkaplan (orijinal boyutta çiz, canvas zaten esneyecek)
+            ctx.drawImage(nightMode ? assets.backgroundNight : assets.backgroundDay, 0, 0, GAME_WIDTH, GAME_HEIGHT);
             
             // Borular
             for (let pipe of pipes) {
@@ -741,8 +732,8 @@
             }
             
             // Base
-            ctx.drawImage(assets.base, baseX, canvas.height - 112, 336, 112);
-            ctx.drawImage(assets.base, baseX + 336, canvas.height - 112, 336, 112);
+            ctx.drawImage(assets.base, baseX, GAME_HEIGHT - 112, 336, 112);
+            ctx.drawImage(assets.base, baseX + 336, GAME_HEIGHT - 112, 336, 112);
             
             // Kuş
             let birdImage;
@@ -756,14 +747,18 @@
             ctx.drawImage(birdImage, -bird.width/2, -bird.height/2, bird.width, bird.height);
             ctx.restore();
             
-            // Başlangıç mesajı (sadece hiç oyun başlamadıysa)
+            // Bekleme mesajı
             if (!gameActive && !questionMode && !gameoverVisible && waitingForStart) {
-                ctx.fillStyle = 'rgba(0,0,0,0.5)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'white';
-                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 20px Arial';
                 ctx.textAlign = 'center';
-                ctx.fillText('Önce soru çözmelisin!', canvas.width/2, 200);
+                ctx.fillText('SORU ÇÖZMEDEN', GAME_WIDTH/2, 200);
+                ctx.fillText('OYUN BAŞLAMAZ!', GAME_WIDTH/2, 240);
+                ctx.font = '16px Arial';
+                ctx.fillStyle = 'white';
+                ctx.fillText('Ekrana tıkla ve soruyu çöz', GAME_WIDTH/2, 300);
             }
         }
         
@@ -776,8 +771,8 @@
         // Tıklama olayları
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+            const scaleX = GAME_WIDTH / rect.width;
+            const scaleY = GAME_HEIGHT / rect.height;
             const x = (e.clientX - rect.left) * scaleX;
             const y = (e.clientY - rect.top) * scaleY;
             
@@ -789,6 +784,9 @@
             if (gameActive && !questionMode) {
                 bird.velocity = bird.jump;
                 try { sounds.wing.play(); } catch(e) {}
+            } else if (!gameActive && !questionMode && waitingForStart) {
+                // Beklerken tıklayınca soru panelini aç
+                loadNewQuestion();
             }
         });
         
@@ -797,8 +795,8 @@
             e.preventDefault();
             const rect = canvas.getBoundingClientRect();
             const touch = e.touches[0];
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
+            const scaleX = GAME_WIDTH / rect.width;
+            const scaleY = GAME_HEIGHT / rect.height;
             const x = (touch.clientX - rect.left) * scaleX;
             const y = (touch.clientY - rect.top) * scaleY;
             
@@ -810,20 +808,15 @@
             if (gameActive && !questionMode) {
                 bird.velocity = bird.jump;
                 try { sounds.wing.play(); } catch(e) {}
+            } else if (!gameActive && !questionMode && waitingForStart) {
+                loadNewQuestion();
             }
         }, { passive: false });
-        
-        // ESC ile sorudan çıkma (sadece oyun içinde)
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Escape' && questionMode && !waitingForStart) {
-                continueGame();
-            }
-        });
         
         // Oyunu başlat - ilk soruyu yükle
         window.onload = () => {
             setTimeout(() => {
-                loadNewQuestion(); // İlk soru
+                loadNewQuestion();
             }, 500);
         };
         
