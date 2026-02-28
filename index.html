@@ -33,14 +33,17 @@
             background: #000;
         }
 
+        /* YATAY OYUN - Genişlik tam, yükseklik oranlı */
         #gameCanvas {
             width: 100%;
-            height: 100%;
-            object-fit: contain;
+            height: auto;
+            max-height: 100vh;
+            aspect-ratio: 288 / 512; /* Orijinal oran korunur */
             image-rendering: crisp-edges;
             image-rendering: pixelated;
             touch-action: none;
             background: #000;
+            box-shadow: 0 0 30px rgba(255,215,0,0.2);
         }
 
         #infoBtn {
@@ -91,25 +94,27 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Skor için özel stil - PNG kullanacağız */
+        /* Skor PNG'leri - BÜYÜTÜLDÜ */
         #scoreContainer {
             position: absolute;
             top: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 2px;
+            gap: 5px;
             z-index: 10;
-            background: rgba(0,0,0,0.3);
-            padding: 5px 10px;
-            border-radius: 30px;
-            backdrop-filter: blur(2px);
+            background: rgba(0,0,0,0.4);
+            padding: 10px 20px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255,215,0,0.5);
         }
 
         .score-digit {
-            width: 24px;
-            height: 36px;
+            width: 36px;  /* Büyütüldü: 24px'den 36px'e */
+            height: 54px;  /* Büyütüldü: 36px'den 54px'e */
             image-rendering: pixelated;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
         }
 
         #questionPanel {
@@ -318,8 +323,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
             z-index: 40;
             display: flex;
             flex-direction: column;
@@ -329,14 +334,15 @@
         }
 
         #menuTitle {
-            font-size: 64px;
+            font-size: min(72px, 10vw);
             font-weight: bold;
             color: #ffd700;
             text-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.5);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-family: 'Arial Black', sans-serif;
             letter-spacing: 4px;
             animation: titlePulse 2s infinite;
+            text-align: center;
         }
 
         @keyframes titlePulse {
@@ -346,18 +352,19 @@
         }
 
         #menuSubtitle {
-            font-size: 24px;
+            font-size: min(24px, 4vw);
             color: white;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             background: rgba(255,215,0,0.2);
             padding: 10px 30px;
             border-radius: 50px;
             border: 2px solid #ffd700;
+            text-align: center;
         }
 
         #menuButton {
             padding: 20px 60px;
-            font-size: 28px;
+            font-size: min(32px, 5vw);
             font-weight: bold;
             background: linear-gradient(145deg, #2ecc71, #27ae60);
             color: white;
@@ -380,24 +387,32 @@
             transform: scale(0.95);
         }
 
-        /* Yatay mod zorlaması */
+        /* Dikey mod uyarısı */
         @media (orientation: portrait) {
             #gameContainer::after {
-                content: "Lütfen telefonu yatay çevir! 📱";
+                content: "📱 TELEFONU YATAY ÇEVİR 📱";
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 color: #ffd700;
-                font-size: 24px;
+                font-size: min(28px, 6vw);
                 font-weight: bold;
                 text-align: center;
-                background: rgba(0,0,0,0.9);
-                padding: 30px;
-                border-radius: 20px;
-                border: 3px solid #ffd700;
+                background: rgba(0,0,0,0.95);
+                padding: 30px 20px;
+                border-radius: 30px;
+                border: 4px solid #ffd700;
                 z-index: 200;
-                width: 80%;
+                width: 90%;
+                box-shadow: 0 0 50px #ffd700;
+                animation: warningPulse 1s infinite;
+            }
+
+            @keyframes warningPulse {
+                0% { box-shadow: 0 0 30px #ffd700; }
+                50% { box-shadow: 0 0 60px #ffd700; }
+                100% { box-shadow: 0 0 30px #ffd700; }
             }
             
             #gameCanvas, #infoBtn, #scoreContainer, #questionPanel, #gameoverScreen, #menuScreen {
@@ -412,7 +427,7 @@
         <div id="infoBtn" onclick="showInfo()">İ</div>
         <div id="infoMessage">OmerAsaf tarafından geliştirildi</div>
         
-        <!-- Skor PNG'leri için container -->
+        <!-- Skor PNG'leri için container - BÜYÜTÜLDÜ -->
         <div id="scoreContainer"></div>
         
         <!-- Menü Ekranı -->
@@ -597,7 +612,7 @@
             document.getElementById('gameoverImage').src = assets.gameover.src;
         };
         
-        // Skoru güncelle - PNG ile göster
+        // Skoru güncelle - PNG ile göster (BÜYÜTÜLDÜ)
         function updateScoreDisplay() {
             const container = document.getElementById('scoreContainer');
             container.innerHTML = '';
