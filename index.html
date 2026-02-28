@@ -36,7 +36,7 @@
         #gameCanvas {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Yatayda tam, dikeyde sabit oran */
+            object-fit: contain;
             image-rendering: crisp-edges;
             image-rendering: pixelated;
             touch-action: none;
@@ -91,16 +91,25 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        #score {
+        /* Skor için özel stil - PNG kullanacağız */
+        #scoreContainer {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            font-size: 48px;
-            font-weight: bold;
-            text-shadow: 3px 3px 0 #000, 5px 5px 0 rgba(0,0,0,0.5);
-            z-index: 5;
-            font-family: 'Arial Black', sans-serif;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+            z-index: 10;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 10px;
+            border-radius: 30px;
+            backdrop-filter: blur(2px);
+        }
+
+        .score-digit {
+            width: 24px;
+            height: 36px;
+            image-rendering: pixelated;
         }
 
         #questionPanel {
@@ -302,6 +311,75 @@
             100% { transform: scale(1); }
         }
 
+        /* Menü stili */
+        #menuScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        #menuTitle {
+            font-size: 64px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.5);
+            margin-bottom: 30px;
+            font-family: 'Arial Black', sans-serif;
+            letter-spacing: 4px;
+            animation: titlePulse 2s infinite;
+        }
+
+        @keyframes titlePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #menuSubtitle {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 50px;
+            background: rgba(255,215,0,0.2);
+            padding: 10px 30px;
+            border-radius: 50px;
+            border: 2px solid #ffd700;
+        }
+
+        #menuButton {
+            padding: 20px 60px;
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(145deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 60px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 30px #ffd700;
+            border: 3px solid #ffd700;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #menuButton:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 50px #ffd700;
+        }
+
+        #menuButton:active {
+            transform: scale(0.95);
+        }
+
         /* Yatay mod zorlaması */
         @media (orientation: portrait) {
             #gameContainer::after {
@@ -322,7 +400,7 @@
                 width: 80%;
             }
             
-            #gameCanvas, #infoBtn, #score, #questionPanel, #gameoverScreen {
+            #gameCanvas, #infoBtn, #scoreContainer, #questionPanel, #gameoverScreen, #menuScreen {
                 display: none !important;
             }
         }
@@ -333,7 +411,16 @@
         <canvas id="gameCanvas" width="288" height="512"></canvas>
         <div id="infoBtn" onclick="showInfo()">İ</div>
         <div id="infoMessage">OmerAsaf tarafından geliştirildi</div>
-        <div id="score">0</div>
+        
+        <!-- Skor PNG'leri için container -->
+        <div id="scoreContainer"></div>
+        
+        <!-- Menü Ekranı -->
+        <div id="menuScreen">
+            <div id="menuTitle">FLAPPY MATH</div>
+            <div id="menuSubtitle">7. Sınıf - Doğru/Ters Orantı</div>
+            <button id="menuButton" onclick="startMenuGame()">OYUNA BAŞLA</button>
+        </div>
         
         <div id="gameoverScreen">
             <img id="gameoverImage" src="sprites/gameover.png" alt="Game Over">
@@ -358,10 +445,10 @@
         
         // Oyun değişkenleri
         let gameActive = false;
-        let questionMode = true;
+        let questionMode = false;
+        let menuVisible = true;
         let score = 0;
         let correctAnswered = false;
-        let waitingForStart = true;
         let gameoverVisible = false;
         
         // Sabitler
@@ -487,6 +574,14 @@
             gameover: new Image()
         };
         
+        // Skor PNG'leri (0-9 arası)
+        const scoreDigits = [];
+        for (let i = 0; i <= 9; i++) {
+            const img = new Image();
+            img.src = `sprites/${i}.png`;
+            scoreDigits.push(img);
+        }
+        
         assets.backgroundDay.src = 'sprites/background-day.png';
         assets.backgroundNight.src = 'sprites/background-night.png';
         assets.base.src = 'sprites/base.png';
@@ -502,12 +597,34 @@
             document.getElementById('gameoverImage').src = assets.gameover.src;
         };
         
+        // Skoru güncelle - PNG ile göster
+        function updateScoreDisplay() {
+            const container = document.getElementById('scoreContainer');
+            container.innerHTML = '';
+            
+            const scoreStr = score.toString();
+            for (let i = 0; i < scoreStr.length; i++) {
+                const digit = parseInt(scoreStr[i]);
+                const img = document.createElement('img');
+                img.src = `sprites/${digit}.png`;
+                img.className = 'score-digit';
+                img.alt = digit;
+                container.appendChild(img);
+            }
+        }
+        
         function showInfo() {
             const msg = document.getElementById('infoMessage');
             msg.style.display = 'block';
             setTimeout(() => {
                 msg.style.display = 'none';
             }, 2000);
+        }
+        
+        function startMenuGame() {
+            menuVisible = false;
+            document.getElementById('menuScreen').style.display = 'none';
+            loadNewQuestion();
         }
         
         function loadNewQuestion() {
@@ -601,7 +718,6 @@
                 document.getElementById('questionPanel').style.display = 'none';
                 questionMode = false;
                 gameActive = true;
-                waitingForStart = false;
                 
                 reset();
             }
@@ -616,13 +732,12 @@
             nightMode = false;
             baseX = 0;
             correctAnswered = false;
-            document.getElementById('score').textContent = '0';
+            updateScoreDisplay();
         }
         
         function gameOver() {
             gameActive = false;
             correctAnswered = false;
-            waitingForStart = true;
             
             try { sounds.die.play(); } catch(e) {}
             
@@ -638,7 +753,7 @@
         }
         
         function update() {
-            if (!gameActive || questionMode) return;
+            if (!gameActive || questionMode || menuVisible) return;
             
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
@@ -660,7 +775,7 @@
                 if (!pipes[i].passed && pipes[i].x + PIPE_WIDTH < bird.x) {
                     pipes[i].passed = true;
                     score++;
-                    document.getElementById('score').textContent = score;
+                    updateScoreDisplay();
                     
                     try { sounds.point.play(); } catch(e) {}
                     
@@ -749,7 +864,7 @@
                 return;
             }
             
-            if (gameActive && !questionMode) {
+            if (gameActive && !questionMode && !menuVisible) {
                 bird.velocity = bird.jump;
                 try { sounds.wing.play(); } catch(e) {}
             }
@@ -769,17 +884,14 @@
                 return;
             }
             
-            if (gameActive && !questionMode) {
+            if (gameActive && !questionMode && !menuVisible) {
                 bird.velocity = bird.jump;
                 try { sounds.wing.play(); } catch(e) {}
             }
         }, { passive: false });
         
-        window.onload = () => {
-            setTimeout(() => {
-                loadNewQuestion();
-            }, 500);
-        };
+        // Menüyü göster
+        document.getElementById('menuScreen').style.display = 'flex';
         
         gameLoop();
     </script>
