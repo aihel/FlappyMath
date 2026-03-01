@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flappy Math - SansiAsaf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Flappy Math - OmerAsaf</title>
     <style>
         * {
             margin: 0;
@@ -21,35 +21,39 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            position: fixed;
         }
 
         #gameContainer {
             position: relative;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #000;
         }
 
-        /* YATAY OYUN - Genişlik tam, yükseklik oranlı */
+        /* Oyun alanı - tam ortalanmış, sabit oran */
         #gameCanvas {
-            width: 100%;
-            height: auto;
-            max-height: 100vh;
-            aspect-ratio: 288 / 512; /* Orijinal oran korunur */
+            width: min(100vh * 0.5625, 100vw); /* 288/512 = 0.5625 oran */
+            height: min(100vw * 1.777, 100vh); /* 512/288 = 1.777 oran */
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
             image-rendering: crisp-edges;
             image-rendering: pixelated;
             touch-action: none;
             background: #000;
             box-shadow: 0 0 30px rgba(255,215,0,0.2);
+            display: block;
+            margin: auto;
         }
 
         #infoBtn {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: max(15px, env(safe-area-inset-top));
+            left: max(15px, env(safe-area-inset-left));
             width: 44px;
             height: 44px;
             background: rgba(255,255,255,0.95);
@@ -74,8 +78,8 @@
 
         #infoMessage {
             position: absolute;
-            top: 80px;
-            left: 20px;
+            top: max(80px, env(safe-area-inset-top) + 60px);
+            left: max(15px, env(safe-area-inset-left));
             background: rgba(0,0,0,0.85);
             color: #ffd700;
             padding: 12px 20px;
@@ -94,36 +98,39 @@
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Skor PNG'leri - BÜYÜTÜLDÜ */
+        /* Skor PNG'leri - tam ortalanmış */
         #scoreContainer {
             position: absolute;
-            top: 30px;
+            top: max(20px, env(safe-area-inset-top) + 10px);
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 5px;
+            gap: 8px;
             z-index: 10;
-            background: rgba(0,0,0,0.4);
-            padding: 10px 20px;
-            border-radius: 40px;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 24px;
+            border-radius: 50px;
             backdrop-filter: blur(4px);
-            border: 2px solid rgba(255,215,0,0.5);
+            border: 2px solid rgba(255,215,0,0.7);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
         .score-digit {
-            width: 36px;  /* Büyütüldü: 24px'den 36px'e */
-            height: 54px;  /* Büyütüldü: 36px'den 54px'e */
+            width: 40px;  /* Daha da büyütüldü */
+            height: 60px;  /* Daha da büyütüldü */
             image-rendering: pixelated;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.7));
+            object-fit: contain;
         }
 
+        /* Soru paneli - tam ortalanmış */
         #questionPanel {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: min(90%, 500px);
-            max-height: 90vh;
+            max-height: 85vh;
             background: linear-gradient(145deg, #1a2f3f, #0f1a24);
             z-index: 100;
             display: none;
@@ -169,7 +176,7 @@
         }
 
         #questionText {
-            font-size: 20px;
+            font-size: 18px;
             line-height: 1.5;
             margin-bottom: 25px;
             padding: 20px;
@@ -183,7 +190,7 @@
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             margin: 15px 0 25px;
         }
 
@@ -191,9 +198,9 @@
             background: rgba(255,255,255,0.1);
             border: 2px solid rgba(255,255,255,0.15);
             color: white;
-            padding: 18px 20px;
+            padding: 16px 20px;
             border-radius: 50px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -227,11 +234,11 @@
 
         #solutionText {
             margin: 15px 0;
-            padding: 20px;
+            padding: 18px;
             background: rgba(52, 152, 219, 0.2);
             border-left: 5px solid #3498db;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             line-height: 1.6;
             display: none;
             backdrop-filter: blur(5px);
@@ -245,11 +252,11 @@
         }
 
         #nextQuestionBtn {
-            margin-top: 12px;
-            padding: 18px;
+            margin-top: 10px;
+            padding: 16px;
             border: none;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -258,15 +265,15 @@
             color: #1a2f3f;
             box-shadow: 0 8px 15px rgba(0,0,0,0.3);
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1px;
         }
 
         #startGameBtn {
-            margin-top: 12px;
+            margin-top: 10px;
             padding: 18px;
             border: none;
             border-radius: 50px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
@@ -290,6 +297,7 @@
             transform: scale(0.95);
         }
 
+        /* Game Over ekranı */
         #gameoverScreen {
             position: absolute;
             top: 0;
@@ -316,14 +324,14 @@
             100% { transform: scale(1); }
         }
 
-        /* Menü stili */
+        /* Menü ekranı */
         #menuScreen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             backdrop-filter: blur(8px);
             z-index: 40;
             display: flex;
@@ -331,18 +339,20 @@
             justify-content: center;
             align-items: center;
             color: white;
+            padding: 20px;
         }
 
         #menuTitle {
-            font-size: min(72px, 10vw);
+            font-size: clamp(40px, 12vw, 72px);
             font-weight: bold;
             color: #ffd700;
             text-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-family: 'Arial Black', sans-serif;
             letter-spacing: 4px;
             animation: titlePulse 2s infinite;
             text-align: center;
+            line-height: 1.2;
         }
 
         @keyframes titlePulse {
@@ -352,7 +362,7 @@
         }
 
         #menuSubtitle {
-            font-size: min(24px, 4vw);
+            font-size: clamp(16px, 4vw, 24px);
             color: white;
             margin-bottom: 40px;
             background: rgba(255,215,0,0.2);
@@ -363,8 +373,8 @@
         }
 
         #menuButton {
-            padding: 20px 60px;
-            font-size: min(32px, 5vw);
+            padding: clamp(15px, 3vh, 20px) clamp(40px, 8vw, 60px);
+            font-size: clamp(20px, 5vw, 32px);
             font-weight: bold;
             background: linear-gradient(145deg, #2ecc71, #27ae60);
             color: white;
@@ -376,19 +386,19 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 2px;
-        }
-
-        #menuButton:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.6), 0 0 50px #ffd700;
+            white-space: nowrap;
         }
 
         #menuButton:active {
             transform: scale(0.95);
         }
 
-        /* Dikey mod uyarısı */
+        /* Dikey mod uyarısı - sadece portrede göster */
         @media (orientation: portrait) {
+            #gameCanvas, #infoBtn, #scoreContainer, #questionPanel, #gameoverScreen, #menuScreen {
+                display: none !important;
+            }
+            
             #gameContainer::after {
                 content: "📱 TELEFONU YATAY ÇEVİR 📱";
                 position: absolute;
@@ -405,18 +415,16 @@
                 border: 4px solid #ffd700;
                 z-index: 200;
                 width: 90%;
+                max-width: 400px;
                 box-shadow: 0 0 50px #ffd700;
                 animation: warningPulse 1s infinite;
+                line-height: 1.4;
             }
 
             @keyframes warningPulse {
                 0% { box-shadow: 0 0 30px #ffd700; }
                 50% { box-shadow: 0 0 60px #ffd700; }
                 100% { box-shadow: 0 0 30px #ffd700; }
-            }
-            
-            #gameCanvas, #infoBtn, #scoreContainer, #questionPanel, #gameoverScreen, #menuScreen {
-                display: none !important;
             }
         }
     </style>
@@ -427,7 +435,7 @@
         <div id="infoBtn" onclick="showInfo()">İ</div>
         <div id="infoMessage">OmerAsaf tarafından geliştirildi</div>
         
-        <!-- Skor PNG'leri için container - BÜYÜTÜLDÜ -->
+        <!-- Skor PNG'leri -->
         <div id="scoreContainer"></div>
         
         <!-- Menü Ekranı -->
@@ -589,7 +597,7 @@
             gameover: new Image()
         };
         
-        // Skor PNG'leri (0-9 arası)
+        // Skor PNG'leri
         const scoreDigits = [];
         for (let i = 0; i <= 9; i++) {
             const img = new Image();
@@ -612,7 +620,7 @@
             document.getElementById('gameoverImage').src = assets.gameover.src;
         };
         
-        // Skoru güncelle - PNG ile göster (BÜYÜTÜLDÜ)
+        // Skoru güncelle
         function updateScoreDisplay() {
             const container = document.getElementById('scoreContainer');
             container.innerHTML = '';
