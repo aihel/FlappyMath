@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
     <title>Flappy Math - OmerAsaf</title>
     <style>
         * {
@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
             user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body, html {
@@ -21,23 +20,22 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            position: fixed;
         }
 
         #gameContainer {
             position: relative;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             background: #000;
         }
 
-        /* Oyun alanı - tam ortalanmış, sabit oran */
+        /* DEV EKRAN - Akıllı tahta için büyütüldü */
         #gameCanvas {
-            width: min(100vh * 0.5625, 100vw); /* 288/512 = 0.5625 oran */
-            height: min(100vw * 1.777, 100vh); /* 512/288 = 1.777 oran */
+            width: min(100vh * 0.5625, 100vw);
+            height: min(100vw * 1.777, 100vh);
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
@@ -45,21 +43,22 @@
             image-rendering: pixelated;
             touch-action: none;
             background: #000;
-            box-shadow: 0 0 30px rgba(255,215,0,0.2);
+            box-shadow: 0 0 50px rgba(255,215,0,0.3);
             display: block;
             margin: auto;
+            border: 2px solid #ffd70033;
         }
 
         #infoBtn {
             position: absolute;
-            top: max(15px, env(safe-area-inset-top));
-            left: max(15px, env(safe-area-inset-left));
-            width: 44px;
-            height: 44px;
+            top: 20px;
+            left: 20px;
+            width: 60px;  /* Büyütüldü */
+            height: 60px; /* Büyütüldü */
             background: rgba(255,255,255,0.95);
-            border: 3px solid #333;
+            border: 4px solid #333;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 32px; /* Büyütüldü */
             font-weight: bold;
             color: #333;
             cursor: pointer;
@@ -68,7 +67,7 @@
             justify-content: center;
             align-items: center;
             transition: all 0.2s;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
         }
 
         #infoBtn:active {
@@ -78,70 +77,70 @@
 
         #infoMessage {
             position: absolute;
-            top: max(80px, env(safe-area-inset-top) + 60px);
-            left: max(15px, env(safe-area-inset-left));
+            top: 100px;
+            left: 20px;
             background: rgba(0,0,0,0.85);
             color: #ffd700;
-            padding: 12px 20px;
-            border-radius: 30px;
-            font-size: 16px;
+            padding: 20px 30px; /* Büyütüldü */
+            border-radius: 50px;
+            font-size: 24px; /* Büyütüldü */
             font-weight: bold;
             z-index: 25;
             display: none;
-            border-left: 4px solid #ffd700;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-left: 6px solid #ffd700;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
             animation: slideIn 0.3s;
         }
 
         @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
+            from { transform: translateX(-30px); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Skor PNG'leri - tam ortalanmış */
+        /* DEV SKOR - Akıllı tahta için büyütüldü */
         #scoreContainer {
             position: absolute;
-            top: max(20px, env(safe-area-inset-top) + 10px);
+            top: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 8px;
+            gap: 15px; /* Büyütüldü */
             z-index: 10;
-            background: rgba(0,0,0,0.5);
-            padding: 12px 24px;
-            border-radius: 50px;
-            backdrop-filter: blur(4px);
-            border: 2px solid rgba(255,215,0,0.7);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            padding: 20px 40px; /* Büyütüldü */
+            border-radius: 80px; /* Büyütüldü */
+            backdrop-filter: blur(8px);
+            border: 4px solid rgba(255,215,0,0.8);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
         }
 
         .score-digit {
-            width: 40px;  /* Daha da büyütüldü */
-            height: 60px;  /* Daha da büyütüldü */
+            width: 80px;  /* ÇOK BÜYÜTÜLDÜ (eski 40px) */
+            height: 120px; /* ÇOK BÜYÜTÜLDÜ (eski 60px) */
             image-rendering: pixelated;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.7));
+            filter: drop-shadow(0 8px 8px rgba(0,0,0,0.7));
             object-fit: contain;
         }
 
-        /* Soru paneli - tam ortalanmış */
+        /* DEV SORU PANELİ - Akıllı tahta için büyütüldü */
         #questionPanel {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: min(90%, 500px);
+            width: min(90%, 800px); /* Büyütüldü (eski 500px) */
             max-height: 85vh;
             background: linear-gradient(145deg, #1a2f3f, #0f1a24);
             z-index: 100;
             display: none;
             flex-direction: column;
-            padding: 30px 25px;
+            padding: 50px 45px; /* Büyütüldü */
             color: white;
             overflow-y: auto;
             animation: fadeIn 0.3s;
-            border-radius: 30px;
-            border: 4px solid #ffd700;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 40px #ffd70066;
+            border-radius: 60px; /* Büyütüldü */
+            border: 6px solid #ffd700; /* Büyütüldü */
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 60px #ffd70066;
         }
 
         @keyframes fadeIn {
@@ -153,36 +152,36 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         #questionType {
             background: #ffd700;
             color: #1a2f3f;
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 16px;
+            padding: 15px 30px; /* Büyütüldü */
+            border-radius: 50px;
+            font-size: 28px; /* Büyütüldü */
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
         #questionCount {
             background: rgba(255,255,255,0.15);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 14px;
-            border: 1px solid rgba(255,255,255,0.2);
+            padding: 15px 30px; /* Büyütüldü */
+            border-radius: 50px;
+            font-size: 26px; /* Büyütüldü */
+            border: 2px solid rgba(255,255,255,0.2);
         }
 
         #questionText {
-            font-size: 18px;
+            font-size: 32px; /* BÜYÜTÜLDÜ */
             line-height: 1.5;
-            margin-bottom: 25px;
-            padding: 20px;
+            margin-bottom: 40px;
+            padding: 30px; /* Büyütüldü */
             background: rgba(255,255,255,0.08);
-            border-radius: 15px;
-            border-left: 5px solid #ffd700;
+            border-radius: 30px;
+            border-left: 8px solid #ffd700;
             font-weight: 500;
             word-wrap: break-word;
         }
@@ -190,24 +189,24 @@
         .options-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin: 15px 0 25px;
+            gap: 20px; /* Büyütüldü */
+            margin: 25px 0 40px;
         }
 
         .option-btn {
             background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.15);
+            border: 4px solid rgba(255,255,255,0.15);
             color: white;
-            padding: 16px 20px;
-            border-radius: 50px;
-            font-size: 18px;
+            padding: 30px 35px; /* BÜYÜTÜLDÜ */
+            border-radius: 80px; /* Büyütüldü */
+            font-size: 36px; /* BÜYÜTÜLDÜ */
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             text-align: left;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             backdrop-filter: blur(5px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
         }
 
         .option-btn:active {
@@ -217,14 +216,14 @@
         .option-btn.correct-highlight {
             background: rgba(46, 204, 113, 0.3);
             border-color: #2ecc71;
-            box-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+            box-shadow: 0 0 30px rgba(46, 204, 113, 0.5);
         }
 
         .option-btn.selected-correct {
             background: linear-gradient(145deg, #27ae60, #2ecc71);
             border-color: #fff;
             transform: scale(1.02);
-            box-shadow: 0 0 20px #2ecc71;
+            box-shadow: 0 0 30px #2ecc71;
         }
 
         .option-btn.selected-wrong {
@@ -233,12 +232,12 @@
         }
 
         #solutionText {
-            margin: 15px 0;
-            padding: 18px;
+            margin: 25px 0;
+            padding: 30px; /* Büyütüldü */
             background: rgba(52, 152, 219, 0.2);
-            border-left: 5px solid #3498db;
-            border-radius: 10px;
-            font-size: 15px;
+            border-left: 8px solid #3498db;
+            border-radius: 20px;
+            font-size: 28px; /* BÜYÜTÜLDÜ */
             line-height: 1.6;
             display: none;
             backdrop-filter: blur(5px);
@@ -247,49 +246,49 @@
         }
 
         @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
+            from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
 
         #nextQuestionBtn {
-            margin-top: 10px;
-            padding: 16px;
+            margin-top: 15px;
+            padding: 30px; /* BÜYÜTÜLDÜ */
             border: none;
-            border-radius: 50px;
-            font-size: 16px;
+            border-radius: 80px;
+            font-size: 32px; /* BÜYÜTÜLDÜ */
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
             display: none;
             background: linear-gradient(145deg, #f39c12, #ffd700);
             color: #1a2f3f;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
         #startGameBtn {
-            margin-top: 10px;
-            padding: 18px;
+            margin-top: 15px;
+            padding: 35px; /* BÜYÜTÜLDÜ */
             border: none;
-            border-radius: 50px;
-            font-size: 18px;
+            border-radius: 80px;
+            font-size: 40px; /* BÜYÜTÜLDÜ */
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
             display: none;
             background: linear-gradient(145deg, #2ecc71, #27ae60);
             color: white;
-            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            border: 3px solid #ffd700;
+            letter-spacing: 3px;
+            border: 6px solid #ffd700;
             animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+            50% { transform: scale(1.03); }
             100% { transform: scale(1); }
         }
 
@@ -297,23 +296,23 @@
             transform: scale(0.95);
         }
 
-        /* Game Over ekranı */
+        /* DEV GAME OVER */
         #gameoverScreen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             z-index: 50;
             display: none;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(5px);
+            backdrop-filter: blur(8px);
         }
 
         #gameoverImage {
-            width: min(80%, 400px);
+            width: min(80%, 700px); /* BÜYÜTÜLDÜ */
             image-rendering: pixelated;
             animation: gameoverPulse 2s infinite;
         }
@@ -324,32 +323,32 @@
             100% { transform: scale(1); }
         }
 
-        /* Menü ekranı */
+        /* DEV MENÜ */
         #menuScreen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
             z-index: 40;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             color: white;
-            padding: 20px;
+            padding: 30px;
         }
 
         #menuTitle {
-            font-size: clamp(40px, 12vw, 72px);
+            font-size: min(120px, 15vw); /* ÇOK BÜYÜK */
             font-weight: bold;
             color: #ffd700;
-            text-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(0,0,0,0.5);
-            margin-bottom: 15px;
+            text-shadow: 6px 6px 0 #000, 12px 12px 0 rgba(0,0,0,0.5);
+            margin-bottom: 30px;
             font-family: 'Arial Black', sans-serif;
-            letter-spacing: 4px;
+            letter-spacing: 8px;
             animation: titlePulse 2s infinite;
             text-align: center;
             line-height: 1.2;
@@ -362,30 +361,30 @@
         }
 
         #menuSubtitle {
-            font-size: clamp(16px, 4vw, 24px);
+            font-size: min(48px, 6vw); /* BÜYÜK */
             color: white;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
             background: rgba(255,215,0,0.2);
-            padding: 10px 30px;
-            border-radius: 50px;
-            border: 2px solid #ffd700;
+            padding: 20px 50px;
+            border-radius: 80px;
+            border: 4px solid #ffd700;
             text-align: center;
         }
 
         #menuButton {
-            padding: clamp(15px, 3vh, 20px) clamp(40px, 8vw, 60px);
-            font-size: clamp(20px, 5vw, 32px);
+            padding: 30px 80px; /* BÜYÜTÜLDÜ */
+            font-size: min(56px, 8vw); /* BÜYÜTÜLDÜ */
             font-weight: bold;
             background: linear-gradient(145deg, #2ecc71, #27ae60);
             color: white;
             border: none;
-            border-radius: 60px;
+            border-radius: 100px;
             cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 30px #ffd700;
-            border: 3px solid #ffd700;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 60px #ffd700;
+            border: 6px solid #ffd700;
             transition: all 0.3s;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 4px;
             white-space: nowrap;
         }
 
@@ -393,38 +392,38 @@
             transform: scale(0.95);
         }
 
-        /* Dikey mod uyarısı - sadece portrede göster */
+        /* Yatay mod zorunlu */
         @media (orientation: portrait) {
             #gameCanvas, #infoBtn, #scoreContainer, #questionPanel, #gameoverScreen, #menuScreen {
                 display: none !important;
             }
             
             #gameContainer::after {
-                content: "📱 TELEFONU YATAY ÇEVİR 📱";
+                content: "📱 LÜTFEN YATAY MODA GEÇİN 📱";
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 color: #ffd700;
-                font-size: min(28px, 6vw);
+                font-size: min(48px, 8vw);
                 font-weight: bold;
                 text-align: center;
                 background: rgba(0,0,0,0.95);
-                padding: 30px 20px;
-                border-radius: 30px;
-                border: 4px solid #ffd700;
+                padding: 50px 30px;
+                border-radius: 50px;
+                border: 6px solid #ffd700;
                 z-index: 200;
                 width: 90%;
-                max-width: 400px;
-                box-shadow: 0 0 50px #ffd700;
+                max-width: 800px;
+                box-shadow: 0 0 80px #ffd700;
                 animation: warningPulse 1s infinite;
                 line-height: 1.4;
             }
 
             @keyframes warningPulse {
-                0% { box-shadow: 0 0 30px #ffd700; }
-                50% { box-shadow: 0 0 60px #ffd700; }
-                100% { box-shadow: 0 0 30px #ffd700; }
+                0% { box-shadow: 0 0 40px #ffd700; }
+                50% { box-shadow: 0 0 80px #ffd700; }
+                100% { box-shadow: 0 0 40px #ffd700; }
             }
         }
     </style>
@@ -435,10 +434,10 @@
         <div id="infoBtn" onclick="showInfo()">İ</div>
         <div id="infoMessage">OmerAsaf tarafından geliştirildi</div>
         
-        <!-- Skor PNG'leri -->
+        <!-- DEV SKOR -->
         <div id="scoreContainer"></div>
         
-        <!-- Menü Ekranı -->
+        <!-- DEV MENÜ -->
         <div id="menuScreen">
             <div id="menuTitle">FLAPPY MATH</div>
             <div id="menuSubtitle">7. Sınıf - Doğru/Ters Orantı</div>
@@ -449,6 +448,7 @@
             <img id="gameoverImage" src="sprites/gameover.png" alt="Game Over">
         </div>
         
+        <!-- DEV SORU PANELİ -->
         <div id="questionPanel">
             <div id="questionHeader">
                 <span id="questionType"></span>
@@ -457,7 +457,7 @@
             <div id="questionText"></div>
             <div class="options-container" id="optionsContainer"></div>
             <div id="solutionText"></div>
-            <button id="nextQuestionBtn" onclick="loadNewQuestion()">Başka Soruya Geç →</button>
+            <button id="nextQuestionBtn" onclick="loadNewQuestion()">BAŞKA SORUYA GEÇ →</button>
             <button id="startGameBtn" onclick="startGameFromQuestion()">🚀 OYUNU BAŞLAT</button>
         </div>
     </div>
@@ -882,7 +882,7 @@
             const x = (e.clientX - rect.left) * scaleX;
             const y = (e.clientY - rect.top) * scaleY;
             
-            if (x < 50 && y < 50) {
+            if (x < 100 && y < 100) { // İ butonu için geniş alan
                 showInfo();
                 return;
             }
@@ -902,7 +902,7 @@
             const x = (touch.clientX - rect.left) * scaleX;
             const y = (touch.clientY - rect.top) * scaleY;
             
-            if (x < 50 && y < 50) {
+            if (x < 100 && y < 100) {
                 showInfo();
                 return;
             }
