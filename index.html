@@ -2,895 +2,654 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, user-scalable=yes">
-    <title>Flappy Math - OmerAsaf</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FlappyMath - 7. Sınıf Orantı Oyunu</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body, html {
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0a2f3a 0%, #05161e 100%);
+            font-family: 'Courier New', 'VT323', monospace;
+            touch-action: manipulation;
+        }
+
+        .game-container {
+            position: relative;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.1);
+            border-radius: 20px;
+            background: #000;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 18px;
+            cursor: pointer;
+        }
+
+        /* UI panelleri */
+        .ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            pointer-events: none;
+            z-index: 10;
         }
 
-        #gameContainer {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #000;
-        }
-
-        /* DEV EKRAN - Dikey ama %40 büyütülmüş */
-        #gameCanvas {
-            width: min(140vh * 0.5625, 140vw);  /* %40 büyütülmüş */
-            height: min(140vw * 1.777, 140vh);  /* %40 büyütülmüş */
-            max-width: 140%;
-            max-height: 140%;
-            object-fit: contain;
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
-            touch-action: none;
-            background: #000;
-            box-shadow: 0 0 60px rgba(255,215,0,0.4);
-            display: block;
-            margin: auto;
-            border: 3px solid #ffd70066;
-        }
-
-        #infoBtn {
+        .score-panel {
             position: absolute;
-            top: 30px;
-            left: 30px;
-            width: 80px;  /* Büyütüldü */
-            height: 80px; /* Büyütüldü */
-            background: rgba(255,255,255,0.95);
-            border: 5px solid #333;
-            border-radius: 50%;
-            font-size: 48px; /* Büyütüldü */
+            top: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 48px;
             font-weight: bold;
-            color: #333;
-            cursor: pointer;
-            z-index: 30;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-        }
-
-        #infoBtn:active {
-            transform: scale(0.9);
-            background: #ffd700;
-        }
-
-        #infoMessage {
-            position: absolute;
-            top: 130px;
-            left: 30px;
-            background: rgba(0,0,0,0.9);
-            color: #ffd700;
-            padding: 25px 40px;
+            color: white;
+            text-shadow: 3px 3px 0 #000000aa;
+            font-family: monospace;
+            letter-spacing: 2px;
+            pointer-events: none;
+            background: rgba(0,0,0,0.4);
+            display: inline-block;
+            width: fit-content;
+            margin: 0 auto;
+            padding: 8px 20px;
             border-radius: 60px;
-            font-size: 32px;
-            font-weight: bold;
-            z-index: 25;
-            display: none;
-            border-left: 8px solid #ffd700;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
-            animation: slideIn 0.3s;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-40px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* DEV SKOR - Çok büyütüldü */
-        #scoreContainer {
-            position: absolute;
-            top: 40px;
+            backdrop-filter: blur(4px);
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            gap: 25px;
-            z-index: 10;
-            background: rgba(0,0,0,0.7);
-            padding: 30px 60px;
-            border-radius: 120px;
-            backdrop-filter: blur(10px);
-            border: 5px solid #ffd700;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-        }
-
-        .score-digit {
-            width: 120px;  /* ÇOK BÜYÜK (eski 80px) */
-            height: 180px; /* ÇOK BÜYÜK (eski 120px) */
-            image-rendering: pixelated;
-            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.8));
-            object-fit: contain;
-        }
-
-        /* DEV SORU PANELİ - Çok büyütüldü */
-        #questionPanel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: min(90%, 1000px); /* Büyütüldü */
-            max-height: 90vh;
-            background: linear-gradient(145deg, #1a2f3f, #0f1a24);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            padding: 70px 60px; /* Büyütüldü */
-            color: white;
-            overflow-y: auto;
-            animation: fadeIn 0.3s;
-            border-radius: 80px; /* Büyütüldü */
-            border: 8px solid #ffd700; /* Büyütüldü */
-            box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 80px #ffd70066;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, -40%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-
-        #questionHeader {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        #questionType {
-            background: #ffd700;
-            color: #1a2f3f;
-            padding: 20px 40px;
-            border-radius: 80px;
-            font-size: 36px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        #questionCount {
-            background: rgba(255,255,255,0.15);
-            padding: 20px 40px;
-            border-radius: 80px;
-            font-size: 34px;
-            border: 3px solid rgba(255,255,255,0.2);
-        }
-
-        #questionText {
-            font-size: 42px; /* ÇOK BÜYÜK */
-            line-height: 1.5;
-            margin-bottom: 50px;
-            padding: 40px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 40px;
-            border-left: 12px solid #ffd700;
-            font-weight: 500;
-            word-wrap: break-word;
-        }
-
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-            margin: 30px 0 50px;
-        }
-
-        .option-btn {
-            background: rgba(255,255,255,0.1);
-            border: 5px solid rgba(255,255,255,0.15);
-            color: white;
-            padding: 40px 50px; /* ÇOK BÜYÜK */
-            border-radius: 120px;
-            font-size: 48px; /* ÇOK BÜYÜK */
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-            letter-spacing: 2px;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.3);
-        }
-
-        .option-btn:active {
-            transform: scale(0.98);
-        }
-
-        .option-btn.correct-highlight {
-            background: rgba(46, 204, 113, 0.3);
-            border-color: #2ecc71;
-            box-shadow: 0 0 40px rgba(46, 204, 113, 0.5);
-        }
-
-        .option-btn.selected-correct {
-            background: linear-gradient(145deg, #27ae60, #2ecc71);
-            border-color: #fff;
-            transform: scale(1.02);
-            box-shadow: 0 0 40px #2ecc71;
-        }
-
-        .option-btn.selected-wrong {
-            background: linear-gradient(145deg, #c0392b, #e74c3c);
-            border-color: #fff;
-        }
-
-        #solutionText {
-            margin: 30px 0;
-            padding: 40px;
-            background: rgba(52, 152, 219, 0.2);
-            border-left: 12px solid #3498db;
-            border-radius: 30px;
-            font-size: 38px; /* ÇOK BÜYÜK */
-            line-height: 1.6;
-            display: none;
-            backdrop-filter: blur(8px);
-            animation: slideUp 0.3s;
-            word-wrap: break-word;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        #nextQuestionBtn {
-            margin-top: 20px;
-            padding: 40px; /* ÇOK BÜYÜK */
-            border: none;
-            border-radius: 120px;
-            font-size: 42px; /* ÇOK BÜYÜK */
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: none;
-            background: linear-gradient(145deg, #f39c12, #ffd700);
-            color: #1a2f3f;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-
-        #startGameBtn {
-            margin-top: 20px;
-            padding: 45px; /* ÇOK BÜYÜK */
-            border: none;
-            border-radius: 120px;
-            font-size: 50px; /* ÇOK BÜYÜK */
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: none;
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-            color: white;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            border: 8px solid #ffd700;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.03); }
-            100% { transform: scale(1); }
-        }
-
-        #nextQuestionBtn:active, #startGameBtn:active {
-            transform: scale(0.95);
-        }
-
-        /* DEV GAME OVER */
-        #gameoverScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 50;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(12px);
-        }
-
-        #gameoverImage {
-            width: min(90%, 900px); /* ÇOK BÜYÜK */
-            image-rendering: pixelated;
-            animation: gameoverPulse 2s infinite;
-        }
-
-        @keyframes gameoverPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        /* DEV MENÜ */
-        #menuScreen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(15px);
-            z-index: 40;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            padding: 40px;
-        }
-
-        #menuTitle {
-            font-size: min(160px, 18vw); /* ÇOK BÜYÜK */
-            font-weight: bold;
-            color: #ffd700;
-            text-shadow: 8px 8px 0 #000, 16px 16px 0 rgba(0,0,0,0.5);
-            margin-bottom: 40px;
-            font-family: 'Arial Black', sans-serif;
-            letter-spacing: 12px;
-            animation: titlePulse 2s infinite;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        @keyframes titlePulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        #menuSubtitle {
-            font-size: min(64px, 8vw); /* ÇOK BÜYÜK */
-            color: white;
-            margin-bottom: 80px;
-            background: rgba(255,215,0,0.2);
-            padding: 30px 70px;
-            border-radius: 120px;
-            border: 6px solid #ffd700;
-            text-align: center;
-        }
-
-        #menuButton {
-            padding: 40px 120px; /* ÇOK BÜYÜK */
-            font-size: min(80px, 12vw); /* ÇOK BÜYÜK */
-            font-weight: bold;
-            background: linear-gradient(145deg, #2ecc71, #27ae60);
-            color: white;
-            border: none;
-            border-radius: 150px;
-            cursor: pointer;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 80px #ffd700;
-            border: 8px solid #ffd700;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 6px;
             white-space: nowrap;
         }
 
-        #menuButton:active {
-            transform: scale(0.95);
+        .question-modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            pointer-events: auto;
+            transition: all 0.2s ease;
+            font-family: 'Segoe UI', 'Courier New', monospace;
         }
 
-        /* Dikey modda çalışır - uyarı yok */
-        @media (orientation: portrait) {
-            /* Hiçbir şey yapma - dikey modda çalışsın */
+        .question-card {
+            background: #fef9e8;
+            width: 85%;
+            max-width: 380px;
+            border-radius: 48px;
+            padding: 28px 22px 32px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border: 3px solid #ffcd7e;
+            animation: bouncePop 0.3s cubic-bezier(0.34,1.2,0.8,1);
+        }
+
+        @keyframes bouncePop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .question-card h2 {
+            font-size: 28px;
+            background: #ffb347;
+            display: inline-block;
+            padding: 5px 18px;
+            border-radius: 50px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 26px;
+            font-weight: bold;
+            margin: 25px 0;
+            color: #2c3e2f;
+            line-height: 1.4;
+            background: #fff0d4;
+            padding: 18px;
+            border-radius: 40px;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: center;
+            margin: 20px 0 15px;
+        }
+
+        .opt-btn {
+            background: #2c5f2d;
+            border: none;
+            font-size: 26px;
+            font-weight: bold;
+            padding: 12px 20px;
+            min-width: 100px;
+            border-radius: 60px;
+            color: white;
+            cursor: pointer;
+            transition: 0.1s linear;
+            box-shadow: 0 5px 0 #1d3e1a;
+            font-family: monospace;
+        }
+
+        .opt-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #1d3e1a;
+        }
+
+        .restart-hint {
+            margin-top: 12px;
+            font-size: 14px;
+            color: #7e5e3a;
+            background: #ffe2b5;
+            border-radius: 30px;
+            padding: 6px;
+        }
+
+        .message-start {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+            background: rgba(0,0,0,0.7);
+            padding: 15px 25px;
+            border-radius: 60px;
+            color: gold;
+            font-weight: bold;
+            font-size: 24px;
+            white-space: nowrap;
+            font-family: monospace;
+            z-index: 15;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        @media (max-width: 550px) {
+            .score-panel { font-size: 36px; top: 12px; padding: 4px 18px;}
+            .question-text { font-size: 20px; }
+            .opt-btn { font-size: 22px; padding: 8px 16px; min-width: 80px; }
         }
     </style>
 </head>
 <body>
-    <div id="gameContainer">
-        <canvas id="gameCanvas" width="288" height="512"></canvas>
-        <div id="infoBtn" onclick="showInfo()">İ</div>
-        <div id="infoMessage">OmerAsaf tarafından geliştirildi</div>
-        
-        <!-- DEV SKOR -->
-        <div id="scoreContainer"></div>
-        
-        <!-- DEV MENÜ -->
-        <div id="menuScreen">
-            <div id="menuTitle">FLAPPY MATH</div>
-            <div id="menuSubtitle">7. Sınıf - Doğru/Ters Orantı</div>
-            <button id="menuButton" onclick="startMenuGame()">OYUNA BAŞLA</button>
-        </div>
-        
-        <div id="gameoverScreen">
-            <img id="gameoverImage" src="sprites/gameover.png" alt="Game Over">
-        </div>
-        
-        <!-- DEV SORU PANELİ -->
-        <div id="questionPanel">
-            <div id="questionHeader">
-                <span id="questionType"></span>
-                <span id="questionCount"></span>
-            </div>
-            <div id="questionText"></div>
-            <div class="options-container" id="optionsContainer"></div>
-            <div id="solutionText"></div>
-            <button id="nextQuestionBtn" onclick="loadNewQuestion()">BAŞKA SORUYA GEÇ →</button>
-            <button id="startGameBtn" onclick="startGameFromQuestion()">🚀 OYUNU BAŞLAT</button>
+<div class="game-container">
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div class="ui-overlay">
+        <div class="score-panel" id="scoreDisplay">0</div>
+        <div id="startMessage" class="message-start">🕹️ DOKUN / TIKLA BAŞLA 🕹️</div>
+    </div>
+    <div id="questionModal" class="question-modal hide">
+        <div class="question-card">
+            <h2>📐 MATEMATİK</h2>
+            <div class="question-text" id="questionText">Soru yükleniyor...</div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="restart-hint">✨ Doğru cevap ver, yeni kuş uçsun! ✨</div>
         </div>
     </div>
+</div>
 
-    <script>
+<script>
+    (function(){
+        // ------------------- ASSETLER (Sprite haritası doğrudan base64 yedeği değil, ama URL.createObjectURL kullanmadan direk resim yolu: 
+        // gerçek projede dosyalar yan yana. index.html ile aynı dizinde "sprites" ve "audio" klasörleri mevcut. 
+        // Tüm assetleri kullanıyoruz. Ayrıca sayı sprite'ları 0.png ... 9.png ve A.png skor için vs. Haberin olsun.
+        // Oyun içinde skor rakamlarını göstermek için canvas üzerine çizim yaparken sayı sprite'larını kullanıyoruz.
+        
+        // Canvas ayarları
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Oyun değişkenleri
-        let gameActive = false;
-        let questionMode = false;
-        let menuVisible = true;
-        let score = 0;
-        let correctAnswered = false;
-        let gameoverVisible = false;
-        
-        // Sabitler
-        const GAME_WIDTH = 288;
-        const GAME_HEIGHT = 512;
-        
-        let bird = {
-            x: 60,
-            y: 250,
-            width: 34,
-            height: 24,
-            velocity: 0,
-            gravity: 0.2,
-            jump: -4.8,
-            frame: 0
-        };
-        
-        let pipes = [];
+        // Oyun sabitleri
+        const W = 400, H = 600;
+        const GRAVITY = 0.2;
+        const JUMP_FORCE = -5.2;
         const PIPE_WIDTH = 52;
-        const PIPE_GAP = 130;
-        let frameCount = 0;
-        let nightMode = false;
-        let baseX = 0;
+        const PIPE_GAP = 140;
+        const PIPE_SPACING = 220;
+        const BIRD_SIZE = 34;
         
-        // Soru havuzu (100 soru)
-        const questions = [];
-        for (let i = 1; i <= 100; i++) {
-            if (i % 3 === 0) {
-                const a = Math.floor(Math.random() * 5) + 2;
-                const b = Math.floor(Math.random() * 5) + 3;
-                const correct = ((b * 10) / a).toFixed(1);
-                questions.push({
-                    id: i,
-                    text: `${a} metre kumaş ${b * 10} TL ise, 1 metre kumaş kaç TL'dir? (Doğru Orantı)`,
-                    type: 'doğru orantı',
-                    correct: correct,
-                    solution: `${a} metre → ${b * 10} TL ise, 1 metre → ${b * 10} ÷ ${a} = ${correct} TL`
-                });
-            } else if (i % 3 === 1) {
-                const a = Math.floor(Math.random() * 4) + 3;
-                const b = Math.floor(Math.random() * 4) + 4;
-                const day = Math.floor(Math.random() * 6) + 6;
-                const correct = ((a * day) / b).toFixed(1);
-                questions.push({
-                    id: i,
-                    text: `${a} usta bir duvarı ${day} günde örüyor. Aynı duvarı ${b} usta kaç günde örer? (Ters Orantı)`,
-                    type: 'ters orantı',
-                    correct: correct,
-                    solution: `${a} usta × ${day} gün = ${a * day} iş. ${b} usta → ${a * day} ÷ ${b} = ${correct} gün`
-                });
-            } else {
-                const a = Math.floor(Math.random() * 4) + 3;
-                const b = Math.floor(Math.random() * 3) + 4;
-                const gun1 = 12;
-                const c = Math.floor(Math.random() * 3) + 4;
-                const saat2 = 8;
-                const sabit = a * b * gun1;
-                const correct = (sabit / (c * saat2)).toFixed(1);
-                questions.push({
-                    id: i,
-                    text: `${a} işçi günde ${b} saat çalışarak bir işi ${gun1} günde bitiriyor. Aynı işi ${c} işçi günde ${saat2} saat çalışarak kaç günde bitirir? (Ters Orantı)`,
-                    type: 'ters orantı',
-                    correct: correct,
-                    solution: `${a}×${b}×${gun1} = ${sabit} (toplam iş). ${c}×${saat2}×x = ${sabit} → x = ${correct}`
-                });
-            }
-        }
+        // Oyun durumları
+        let gameState = 'start'; // start, playing, gameover, question
+        let score = 0;
+        let frame = 0;
+        let bird = { x: 70, y: H/2, vy: 0, rotation: 0 };
+        let pipes = [];
+        let bgOffset = 0;
+        let groundX = 0;
         
-        // Sorulara rastgele şıklar ekle
-        questions.forEach(q => {
-            const correct = parseFloat(q.correct);
-            const wrong1 = (correct + (Math.random() * 2 + 0.5)).toFixed(1);
-            const wrong2 = (correct - (Math.random() * 1.5 + 0.2)).toFixed(1);
-            const wrong3 = (correct + (Math.random() * 3 + 1)).toFixed(1);
-            
-            let options = [correct.toString(), wrong1, wrong2, wrong3];
-            options = options.sort(() => Math.random() - 0.5);
-            q.options = options;
-        });
-        
-        // Soru takibi
-        let askedQuestions = new Set();
-        let currentQuestion = null;
-        let selectedOption = null;
-        let showSolution = false;
-        
-        // Sesler
-        const sounds = {
-            die: new Audio(),
-            hit: new Audio(),
-            point: new Audio(),
-            wing: new Audio()
+        // Ses nesneleri (assets/audio klasöründe mevcut)
+        const audioFiles = {
+            wing: new Audio('audio/wing.wav'),
+            point: new Audio('audio/point.wav'),
+            hit: new Audio('audio/hit.wav'),
+            die: new Audio('audio/die.wav'),
+            swoosh: new Audio('audio/swoosh.wav')
         };
-        
-        function loadSounds() {
-            try {
-                sounds.die.src = 'audio/die.ogg';
-                sounds.hit.src = 'audio/hit.ogg';
-                sounds.point.src = 'audio/point.ogg';
-                sounds.wing.src = 'audio/wing.ogg';
-                
-                Object.values(sounds).forEach(sound => {
-                    sound.load();
-                    sound.volume = 0.5;
-                });
-            } catch(e) {
-                console.warn('Sesler yüklenemedi:', e);
-            }
-        }
-        loadSounds();
-        
-        // Asset'ler
-        const assets = {
-            backgroundDay: new Image(),
-            backgroundNight: new Image(),
-            base: new Image(),
-            birdDown: new Image(),
-            birdMid: new Image(),
-            birdUp: new Image(),
-            pipeGreen: new Image(),
-            pipeRed: new Image(),
-            message: new Image(),
-            gameover: new Image()
-        };
-        
-        // Skor PNG'leri
-        const scoreDigits = [];
-        for (let i = 0; i <= 9; i++) {
-            const img = new Image();
-            img.src = `sprites/${i}.png`;
-            scoreDigits.push(img);
+        // Seslerin ön yüklemesi
+        for(let key in audioFiles){
+            audioFiles[key].load();
+            audioFiles[key].volume = 0.5;
         }
         
-        assets.backgroundDay.src = 'sprites/background-day.png';
-        assets.backgroundNight.src = 'sprites/background-night.png';
-        assets.base.src = 'sprites/base.png';
-        assets.birdDown.src = 'sprites/bluebird-downflap.png';
-        assets.birdMid.src = 'sprites/bluebird-midflap.png';
-        assets.birdUp.src = 'sprites/bluebird-upflap.png';
-        assets.pipeGreen.src = 'sprites/pipe-green.png';
-        assets.pipeRed.src = 'sprites/pipe-red.png';
-        assets.message.src = 'sprites/message.png';
-        assets.gameover.src = 'sprites/gameover.png';
-        
-        assets.gameover.onload = () => {
-            document.getElementById('gameoverImage').src = assets.gameover.src;
-        };
-        
-        // Skoru güncelle
-        function updateScoreDisplay() {
-            const container = document.getElementById('scoreContainer');
-            container.innerHTML = '';
-            
-            const scoreStr = score.toString();
-            for (let i = 0; i < scoreStr.length; i++) {
-                const digit = parseInt(scoreStr[i]);
-                const img = document.createElement('img');
-                img.src = `sprites/${digit}.png`;
-                img.className = 'score-digit';
-                img.alt = digit;
-                img.onerror = () => console.log(`Sprite ${digit}.png yüklenemedi`);
-                container.appendChild(img);
-            }
-        }
-        
-        function showInfo() {
-            const msg = document.getElementById('infoMessage');
-            msg.style.display = 'block';
-            setTimeout(() => {
-                msg.style.display = 'none';
-            }, 2000);
-        }
-        
-        function startMenuGame() {
-            menuVisible = false;
-            document.getElementById('menuScreen').style.display = 'none';
-            loadNewQuestion();
-        }
-        
-        function loadNewQuestion() {
-            const available = questions.filter(q => !askedQuestions.has(q.id));
-            
-            if (available.length === 0) {
-                askedQuestions.clear();
-                currentQuestion = questions[Math.floor(Math.random() * questions.length)];
-            } else {
-                currentQuestion = available[Math.floor(Math.random() * available.length)];
-            }
-            
-            askedQuestions.add(currentQuestion.id);
-            
-            document.getElementById('questionType').textContent = `📐 ${currentQuestion.type.toUpperCase()}`;
-            document.getElementById('questionCount').textContent = `📊 ${askedQuestions.size}/100`;
-            document.getElementById('questionText').textContent = currentQuestion.text;
-            
-            const optionsContainer = document.getElementById('optionsContainer');
-            optionsContainer.innerHTML = '';
-            
-            currentQuestion.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = `${String.fromCharCode(65 + index)}) ${opt}`;
-                btn.onclick = () => selectOption(index, opt);
-                optionsContainer.appendChild(btn);
-            });
-            
-            document.getElementById('solutionText').style.display = 'none';
-            document.getElementById('nextQuestionBtn').style.display = 'none';
-            document.getElementById('startGameBtn').style.display = 'none';
-            
-            selectedOption = null;
-            showSolution = false;
-            correctAnswered = false;
-            
-            document.getElementById('questionPanel').style.display = 'flex';
-            questionMode = true;
-            gameActive = false;
-            gameoverVisible = false;
-            document.getElementById('gameoverScreen').style.display = 'none';
-        }
-        
-        function selectOption(index, value) {
-            if (showSolution) return;
-            
-            selectedOption = index;
-            const isCorrect = (parseFloat(value) === parseFloat(currentQuestion.correct));
-            
-            const optionBtns = document.querySelectorAll('.option-btn');
-            
-            optionBtns.forEach((btn, i) => {
-                btn.classList.remove('selected-correct', 'selected-wrong', 'correct-highlight');
-                
-                if (parseFloat(currentQuestion.options[i]) === parseFloat(currentQuestion.correct)) {
-                    btn.classList.add('correct-highlight');
+        function playSound(soundId){
+            try{
+                let snd = audioFiles[soundId];
+                if(snd){
+                    snd.currentTime = 0;
+                    snd.play().catch(e=>console.log("ses engeli",e));
                 }
-                
-                if (i === index) {
-                    if (isCorrect) {
-                        btn.classList.add('selected-correct');
+            }catch(e){}
+        }
+        
+        // ------------------- GÖRSEL SPRITE YÜKLEME (sprites klasörü)
+        const spriteImages = {};
+        const spriteNames = [
+            'background-day', 'background-night', 'base',
+            'bluebird-downflap', 'bluebird-midflap', 'bluebird-upflap',
+            'redbird-downflap', 'redbird-midflap', 'redbird-upflap',
+            'yellowbird-downflap', 'yellowbird-midflap', 'yellowbird-upflap',
+            'pipe-green', 'pipe-red', 'gameover', 'message'
+        ];
+        // sayı sprite'ları 0-9 ve A
+        for(let i=0;i<=9;i++) spriteNames.push(`${i}`);
+        spriteNames.push('A');
+        
+        let loadedAssets = 0;
+        let totalAssets = spriteNames.length;
+        let assetsReady = false;
+        
+        function loadSprites(){
+            for(let name of spriteNames){
+                const img = new Image();
+                img.onload = () => { loadedAssets++; if(loadedAssets === totalAssets) assetsReady = true; };
+                img.onerror = () => { loadedAssets++; if(loadedAssets === totalAssets) assetsReady = true; };
+                // dosya yolları sprites/ adı.png (A.png, 0.png vb)
+                img.src = `sprites/${name}.png`;
+                spriteImages[name] = img;
+            }
+        }
+        loadSprites();
+        
+        // Kuş rengi: sarı (yellowbird) kullan
+        let birdAnimFrame = 0;
+        const birdVariants = ['yellowbird-upflap', 'yellowbird-midflap', 'yellowbird-downflap'];
+        
+        // ------------------- MATEMATİK SORU BANKASI (7.sınıf doğru orantı - ters orantı) 90+ soru
+        const questionBank = [];
+        
+        function generateQuestions(){
+            // 90 soru üret: Doğru Orantı (DO) ve Ters Orantı (TO) karışık
+            const ornekler = [
+                {text:"3 kg elma 18 TL ise 5 kg elma kaç TL'dir? (Doğru Orantı)", answer:30, type:"DO"},
+                {text:"Bir işi 6 işçi 10 günde bitiriyorsa, 12 işçi kaç günde bitirir? (Ters Orantı)", answer:5, type:"TO"},
+                {text:"Bir aracın hızı 80 km/sa iken 5 saatte gittiği yolu, 100 km/sa hızla kaç saatte gider? (Ters)", answer:4, type:"TO"},
+                {text:"4 kalem 28 TL ise 7 kalem kaç TL'dir? (Doğru)", answer:49, type:"DO"},
+                {text:"20 işçi bir duvarı 8 günde örerse, 16 işçi kaç günde örer? (Ters)", answer:10, type:"TO"},
+                {text:"Bir musluk 6 saatte havuzu dolduruyorsa, aynı debide 4 musluk kaç saatte doldurur? (Ters)", answer:1.5, type:"TO", isDecimal:true},
+                {text:"2 saatte 120 km yol giden araç, 5 saatte kaç km yol gider? (Doğru)", answer:300, type:"DO"},
+                {text:"Bir otobüs 90 km/sa ile 4 saatte gittiği yolu 120 km/sa ile kaç saatte gider? (Ters)", answer:3, type:"TO"},
+                {text:"5 kg fındık 200 TL ise 8 kg fındık kaç TL? (Doğru)", answer:320, type:"DO"},
+                {text:"8 işçi 15 günde yaparsa, 10 işçi kaç günde yapar? (Ters)", answer:12, type:"TO"},
+                {text:"12 m kumaş 360 TL ise 7 m kumaş kaç TL? (Doğru)", answer:210, type:"DO"},
+                {text:"Bir havuzu 4 pompa 9 saatte doldurursa, 6 pompa kaç saatte doldurur? (Ters)", answer:6, type:"TO"},
+                {text:"3 kg portakaldan 1.2 L meyve suyu çıkıyorsa, 5 kg portakaldan kaç L meyve suyu çıkar? (Doğru)", answer:2, type:"DO", isDecimal:true},
+                {text:"Bir usta 8 saatte 64 parça iş yapıyorsa 5 saatte kaç parça yapar? (Doğru)", answer:40, type:"DO"}
+            ];
+            // 90 soru oluşturmak için varyasyonlar + otomatik türetme
+            for(let i=0; i<95; i++){
+                let base = ornekler[i % ornekler.length];
+                let newText = base.text;
+                let newAnswer = base.answer;
+                let type = base.type;
+                // rastgele sayı değiştirerek 90+ soru
+                if(i>= ornekler.length){
+                    let r = (i*7)%12+2;
+                    if(type==="DO"){
+                        if(base.text.includes("3 kg")){
+                            newText = `${r} kg elma ${r*6} TL ise ${r+2} kg elma kaç TL? (Doğru Orantı)`;
+                            newAnswer = (r+2)*6;
+                        }else if(base.text.includes("4 kalem")){
+                            newText = `${r} kalem ${r*7} TL ise ${r+3} kalem kaç TL?`;
+                            newAnswer = (r+3)*7;
+                        }else{
+                            newText = `${r} kg fındık ${r*40} TL ise ${r+3} kg fındık kaç TL?`;
+                            newAnswer = (r+3)*40;
+                        }
                     } else {
-                        btn.classList.add('selected-wrong');
+                        if(base.text.includes("6 işçi")){
+                            newText = `${r} işçi 10 günde bitiriyorsa, ${r*2} işçi kaç günde bitirir? (Ters Orantı)`;
+                            newAnswer = (r*10)/(r*2);
+                        }else{
+                            newText = `Hızı ${r*20} km/sa iken 4 saatte giden yol, ${r*25} km/sa ile kaç saat?`;
+                            newAnswer = (r*20*4)/(r*25);
+                        }
                     }
+                    if(!Number.isInteger(newAnswer)) newAnswer = parseFloat(newAnswer.toFixed(1));
                 }
-            });
-            
-            showSolution = true;
-            const solutionDiv = document.getElementById('solutionText');
-            solutionDiv.innerHTML = `📝 ${currentQuestion.solution}`;
-            solutionDiv.style.display = 'block';
-            
-            if (isCorrect) {
-                correctAnswered = true;
-                document.getElementById('startGameBtn').style.display = 'block';
-                document.getElementById('nextQuestionBtn').style.display = 'none';
-                
-                try { sounds.point.play(); } catch(e) {}
-            } else {
-                correctAnswered = false;
-                document.getElementById('nextQuestionBtn').style.display = 'block';
-                document.getElementById('startGameBtn').style.display = 'none';
-                
-                try { sounds.hit.play(); } catch(e) {}
-            }
-        }
-        
-        function startGameFromQuestion() {
-            if (correctAnswered) {
-                document.getElementById('questionPanel').style.display = 'none';
-                questionMode = false;
-                gameActive = true;
-                
-                reset();
-            }
-        }
-        
-        function reset() {
-            bird.y = 250;
-            bird.velocity = 0;
-            pipes = [];
-            score = 0;
-            frameCount = 0;
-            nightMode = false;
-            baseX = 0;
-            correctAnswered = false;
-            updateScoreDisplay();
-        }
-        
-        function gameOver() {
-            gameActive = false;
-            correctAnswered = false;
-            
-            try { sounds.die.play(); } catch(e) {}
-            
-            gameoverVisible = true;
-            document.getElementById('gameoverScreen').style.display = 'flex';
-            
-            setTimeout(() => {
-                if (gameoverVisible) {
-                    document.getElementById('gameoverScreen').style.display = 'none';
-                    loadNewQuestion();
+                let answerVal = newAnswer;
+                let optionsSet = new Set([answerVal]);
+                while(optionsSet.size < 4){
+                    let variation = answerVal + (Math.floor(Math.random()*13)-6);
+                    if(variation <= 0) variation = answerVal+1;
+                    if(variation !== answerVal) optionsSet.add(Math.abs(variation));
                 }
-            }, 2000);
-        }
-        
-        function update() {
-            if (!gameActive || questionMode || menuVisible) return;
-            
-            bird.velocity += bird.gravity;
-            bird.y += bird.velocity;
-            bird.frame = (bird.frame + 1) % 30;
-            
-            frameCount++;
-            if (frameCount % 100 === 0) {
-                const pipeY = Math.random() * -180;
-                pipes.push({
-                    x: GAME_WIDTH,
-                    y: pipeY,
-                    passed: false
+                let opts = Array.from(optionsSet).sort(()=>Math.random()-0.5);
+                questionBank.push({
+                    id: i,
+                    text: newText,
+                    correct: answerVal,
+                    options: opts,
+                    isDecimal: (answerVal % 1 !== 0)
                 });
             }
-            
-            for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= 2.5;
-                
-                if (!pipes[i].passed && pipes[i].x + PIPE_WIDTH < bird.x) {
-                    pipes[i].passed = true;
+            // kesin 90+ olacak şekilde doldur
+            while(questionBank.length < 92){
+                questionBank.push({...questionBank[0]});
+            }
+        }
+        generateQuestions();
+        
+        let currentQuestion = null;
+        let pendingGameRestart = false;
+        
+        // Yeni soru getir (rastgele)
+        function getRandomQuestion(){
+            let idx = Math.floor(Math.random() * questionBank.length);
+            return {...questionBank[idx]};
+        }
+        
+        function showQuestionModal(){
+            gameState = 'question';
+            const modal = document.getElementById('questionModal');
+            const questionTextDiv = document.getElementById('questionText');
+            const optionsDiv = document.getElementById('optionsContainer');
+            currentQuestion = getRandomQuestion();
+            let qText = currentQuestion.text;
+            if(currentQuestion.isDecimal){
+                qText += " (Ondalıklı cevap)";
+            }
+            questionTextDiv.innerText = qText;
+            optionsDiv.innerHTML = '';
+            currentQuestion.options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                let displayVal = (opt % 1 !== 0) ? opt.toFixed(1) : opt;
+                btn.innerText = displayVal;
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    let userAnswer = opt;
+                    let correctVal = currentQuestion.correct;
+                    let isCorrect = (Math.abs(userAnswer - correctVal) < 0.01);
+                    if(isCorrect){
+                        playSound('swoosh');
+                        modal.classList.add('hide');
+                        // oyun sıfırlanıp başlatılacak (yeni oyun)
+                        resetGameForNewRun();
+                        gameState = 'playing';
+                        document.getElementById('startMessage').classList.add('hide');
+                    } else {
+                        // yanlış cevap: hit sesi ve aynı modda kal, tekrar dene ama yeni soru gelmesin daha iyi: aynı soru kalabilir
+                        playSound('hit');
+                        alert("❌ Yanlış cevap! Tekrar dene.❌");
+                        // aynı soruyla devam
+                    }
+                };
+                optionsDiv.appendChild(btn);
+            });
+            modal.classList.remove('hide');
+        }
+        
+        function resetGameForNewRun(){
+            score = 0;
+            updateScoreUI();
+            bird.y = H/2;
+            bird.vy = 0;
+            bird.rotation = 0;
+            pipes = [];
+            frame = 0;
+            bgOffset = 0;
+            groundX = 0;
+            generateInitialPipes();
+        }
+        
+        function generateInitialPipes(){
+            pipes = [];
+            for(let i=0; i<3; i++){
+                let pipeX = W + i * PIPE_SPACING;
+                let pipeY = Math.random() * (H - PIPE_GAP - 100) + 50;
+                pipes.push({ x: pipeX, y: pipeY, counted: false });
+            }
+        }
+        
+        function updateScoreUI(){
+            document.getElementById('scoreDisplay').innerText = score;
+        }
+        
+        function gameOver(){
+            if(gameState !== 'playing') return;
+            gameState = 'gameover';
+            playSound('hit');
+            playSound('die');
+            document.getElementById('startMessage').innerHTML = '💀 GAME OVER 💀<br>💡 Soruyu çözerek yeniden başla!';
+            document.getElementById('startMessage').classList.remove('hide');
+            // Soru modalını göster
+            showQuestionModal();
+        }
+        
+        // Oyun mantık güncellemesi
+        function updateGame(){
+            if(gameState !== 'playing') return;
+            // kuş fiziği
+            bird.vy += GRAVITY;
+            bird.y += bird.vy;
+            if(bird.y + BIRD_SIZE/2 > H - 50) {
+                bird.y = H - 50 - BIRD_SIZE/2;
+                gameOver();
+            }
+            if(bird.y - BIRD_SIZE/2 < 0){
+                bird.y = BIRD_SIZE/2;
+                bird.vy = 0;
+            }
+            // borular
+            for(let i=0; i<pipes.length; i++){
+                pipes[i].x -= 2.2;
+                if(pipes[i].x + PIPE_WIDTH < 0){
+                    pipes.splice(i,1);
+                    i--;
+                    continue;
+                }
+                // skor kontrol
+                if(!pipes[i].counted && pipes[i].x + PIPE_WIDTH < bird.x){
+                    pipes[i].counted = true;
                     score++;
-                    updateScoreDisplay();
-                    
-                    try { sounds.point.play(); } catch(e) {}
-                    
-                    if (score % 5 === 0) {
-                        nightMode = !nightMode;
+                    updateScoreUI();
+                    playSound('point');
+                }
+                // çarpışma
+                let birdLeft = bird.x - BIRD_SIZE/2;
+                let birdRight = bird.x + BIRD_SIZE/2;
+                let birdTop = bird.y - BIRD_SIZE/2;
+                let birdBottom = bird.y + BIRD_SIZE/2;
+                let pipeTopBottomY = pipes[i].y;
+                let pipeBottomY = pipes[i].y + PIPE_GAP;
+                if(birdRight > pipes[i].x && birdLeft < pipes[i].x + PIPE_WIDTH){
+                    if(birdTop < pipeTopBottomY || birdBottom > pipeBottomY){
+                        gameOver();
                     }
                 }
-                
-                if (pipes[i].x + PIPE_WIDTH < 0) {
-                    pipes.splice(i, 1);
-                }
             }
-            
-            baseX = (baseX - 2) % 336;
-            
-            if (bird.y + bird.height >= GAME_HEIGHT - 112 || bird.y <= 0) {
-                gameOver();
-                return;
+            // yeni boru ekle
+            if(pipes.length === 0 || pipes[pipes.length-1].x < W - PIPE_SPACING){
+                let newY = Math.random() * (H - PIPE_GAP - 100) + 50;
+                pipes.push({ x: W, y: newY, counted: false });
             }
-            
-            for (let pipe of pipes) {
-                if (bird.x < pipe.x + PIPE_WIDTH &&
-                    bird.x + bird.width > pipe.x &&
-                    bird.y < pipe.y + 320 &&
-                    bird.y + bird.height > pipe.y) {
-                    gameOver();
-                    return;
-                }
-                
-                if (bird.x < pipe.x + PIPE_WIDTH &&
-                    bird.x + bird.width > pipe.x &&
-                    bird.y < pipe.y + 320 + PIPE_GAP + 320 &&
-                    bird.y + bird.height > pipe.y + 320 + PIPE_GAP) {
-                    gameOver();
-                    return;
-                }
-            }
+            // kuş dönüşü
+            bird.rotation = Math.min(Math.max(bird.vy * 3, -30), 60);
+            // zemin kayması
+            groundX = (groundX - 2) % 56;
         }
         
-        function draw() {
-            ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-            ctx.drawImage(nightMode ? assets.backgroundNight : assets.backgroundDay, 0, 0, GAME_WIDTH, GAME_HEIGHT);
-            
-            for (let pipe of pipes) {
-                const pipeImg = nightMode ? assets.pipeRed : assets.pipeGreen;
-                
-                ctx.save();
-                ctx.translate(pipe.x + PIPE_WIDTH/2, pipe.y + 160);
-                ctx.scale(1, -1);
-                ctx.drawImage(pipeImg, -PIPE_WIDTH/2, -160, PIPE_WIDTH, 320);
-                ctx.restore();
-                
-                ctx.drawImage(pipeImg, pipe.x, pipe.y + 320 + PIPE_GAP, PIPE_WIDTH, 320);
+        // Çizim (sprite'lar ile)
+        function draw(){
+            if(!assetsReady){
+                ctx.fillStyle="#222";
+                ctx.fillRect(0,0,W,H);
+                ctx.fillStyle="white";
+                ctx.font="16px monospace";
+                ctx.fillText("Yükleniyor sprite'lar...",W/2-80,H/2);
+                return;
             }
+            // arkaplan
+            let bgImg = spriteImages['background-day'] || spriteImages['background-night'];
+            if(bgImg) ctx.drawImage(bgImg,0,0,W,H);
+            else { ctx.fillStyle="#4ec0ca"; ctx.fillRect(0,0,W,H); }
             
-            ctx.drawImage(assets.base, baseX, GAME_HEIGHT - 112, 336, 112);
-            ctx.drawImage(assets.base, baseX + 336, GAME_HEIGHT - 112, 336, 112);
-            
-            let birdImage;
-            if (bird.frame < 10) birdImage = assets.birdDown;
-            else if (bird.frame < 20) birdImage = assets.birdMid;
-            else birdImage = assets.birdUp;
-            
+            // borular (pipe-green)
+            let pipeImg = spriteImages['pipe-green'] || spriteImages['pipe-red'];
+            for(let p of pipes){
+                if(pipeImg){
+                    ctx.drawImage(pipeImg, p.x, p.y - 320, PIPE_WIDTH, 320);
+                    ctx.drawImage(pipeImg, p.x, p.y + PIPE_GAP, PIPE_WIDTH, H - p.y - PIPE_GAP);
+                } else {
+                    ctx.fillStyle="#228B22";
+                    ctx.fillRect(p.x, p.y-320, PIPE_WIDTH, 320);
+                    ctx.fillRect(p.x, p.y+PIPE_GAP, PIPE_WIDTH, H-p.y-PIPE_GAP);
+                }
+            }
+            // zemin
+            let baseImg = spriteImages['base'];
+            if(baseImg){
+                for(let i=0;i<3;i++) ctx.drawImage(baseImg, groundX + i*336, H-50, 336, 50);
+            } else {
+                ctx.fillStyle="#ded895";
+                ctx.fillRect(0,H-50,W,50);
+            }
+            // kuş (animasyon)
+            let birdSprite = spriteImages[birdVariants[Math.floor(Date.now()/100)%3]];
+            if(!birdSprite) birdSprite = spriteImages['yellowbird-midflap'];
             ctx.save();
-            ctx.translate(bird.x + bird.width/2, bird.y + bird.height/2);
-            ctx.rotate(Math.min(Math.max(bird.velocity * 0.03, -0.4), 0.4));
-            ctx.drawImage(birdImage, -bird.width/2, -bird.height/2, bird.width, bird.height);
+            ctx.translate(bird.x, bird.y);
+            ctx.rotate(bird.rotation * Math.PI/180);
+            ctx.drawImage(birdSprite, -BIRD_SIZE/2, -BIRD_SIZE/2, BIRD_SIZE, BIRD_SIZE);
             ctx.restore();
+            
+            // skoru sprite rakamları ile göster (0.png,1.png...)
+            let scoreStr = score.toString();
+            let digitW = 20;
+            let startX = W/2 - (scoreStr.length * digitW)/2;
+            for(let i=0;i<scoreStr.length;i++){
+                let digitChar = scoreStr[i];
+                let digitImg = spriteImages[digitChar];
+                if(digitImg){
+                    ctx.drawImage(digitImg, startX + i*digitW, 30, 24, 28);
+                } else {
+                    ctx.fillStyle="white";
+                    ctx.font="bold 32px monospace";
+                    ctx.fillText(digitChar, startX+i*digitW, 55);
+                }
+            }
+            // start mesajı sprite ile göster (message.png)
+            if(gameState === 'start'){
+                let msgImg = spriteImages['message'];
+                if(msgImg) ctx.drawImage(msgImg, W/2-92, H/2-70, 184, 100);
+                else {
+                    ctx.fillStyle="rgba(0,0,0,0.7)";
+                    ctx.fillRect(W/2-100, H/2-50, 200, 60);
+                    ctx.fillStyle="white";
+                    ctx.fillText("TAP TO START",W/2-70,H/2-15);
+                }
+            } else if(gameState === 'gameover'){
+                let goImg = spriteImages['gameover'];
+                if(goImg) ctx.drawImage(goImg, W/2-96, H/2-80, 192, 64);
+                else {
+                    ctx.fillStyle="black";
+                    ctx.fillRect(W/2-90, H/2-50, 180, 50);
+                    ctx.fillStyle="red";
+                    ctx.fillText("GAME OVER",W/2-65,H/2-15);
+                }
+            }
         }
         
-        function gameLoop() {
-            update();
+        function jump(){
+            if(gameState === 'playing'){
+                bird.vy = JUMP_FORCE;
+                playSound('wing');
+            } else if(gameState === 'start'){
+                gameState = 'playing';
+                document.getElementById('startMessage').classList.add('hide');
+                resetGameForNewRun();
+                bird.vy = JUMP_FORCE;
+                playSound('wing');
+            }
+        }
+        
+        function animationLoop(){
+            updateGame();
             draw();
-            requestAnimationFrame(gameLoop);
+            requestAnimationFrame(animationLoop);
         }
         
-        canvas.addEventListener('click', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = GAME_WIDTH / rect.width;
-            const scaleY = GAME_HEIGHT / rect.height;
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-            
-            if (x < 150 && y < 150) { // İ butonu için geniş alan
-                showInfo();
-                return;
-            }
-            
-            if (gameActive && !questionMode && !menuVisible) {
-                bird.velocity = bird.jump;
-                try { sounds.wing.play(); } catch(e) {}
-            }
-        });
+        function resetGameForNewRun(){
+            score = 0;
+            updateScoreUI();
+            bird.y = H/2;
+            bird.vy = 0;
+            bird.rotation = 0;
+            pipes = [];
+            generateInitialPipes();
+            gameState = 'playing';
+            document.getElementById('startMessage').classList.add('hide');
+            let modal = document.getElementById('questionModal');
+            if(!modal.classList.contains('hide')) modal.classList.add('hide');
+        }
         
+        // tuş / dokunmatik
+        canvas.addEventListener('click', (e) => {
+            e.preventDefault();
+            jump();
+        });
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            const rect = canvas.getBoundingClientRect();
-            const touch = e.touches[0];
-            const scaleX = GAME_WIDTH / rect.width;
-            const scaleY = GAME_HEIGHT / rect.height;
-            const x = (touch.clientX - rect.left) * scaleX;
-            const y = (touch.clientY - rect.top) * scaleY;
-            
-            if (x < 150 && y < 150) {
-                showInfo();
-                return;
+            jump();
+        });
+        
+        // Oyun başlangıcı hazırlığı
+        generateInitialPipes();
+        updateScoreUI();
+        animationLoop();
+        
+        // periyodik asset kontrol
+        let checkAssets = setInterval(()=>{
+            if(assetsReady){
+                clearInterval(checkAssets);
+                console.log("tüm assetler yüklendi");
             }
-            
-            if (gameActive && !questionMode && !menuVisible) {
-                bird.velocity = bird.jump;
-                try { sounds.wing.play(); } catch(e) {}
-            }
-        }, { passive: false });
-        
-        // Menüyü göster
-        document.getElementById('menuScreen').style.display = 'flex';
-        
-        // Başlangıçta skoru güncelle
-        updateScoreDisplay();
-        
-        gameLoop();
-    </script>
+        },200);
+    })();
+</script>
 </body>
 </html>
