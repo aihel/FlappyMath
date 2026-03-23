@@ -2,8 +2,8 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>FlappyMath - 7. Sınıf Orantı Oyunu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FlappyMath - Dikey Orantı Oyunu</title>
     <style>
         * {
             margin: 0;
@@ -21,26 +21,35 @@
             background: linear-gradient(145deg, #0a2f3a 0%, #05161e 100%);
             font-family: 'Courier New', 'VT323', monospace;
             touch-action: manipulation;
+            padding: 0;
+            margin: 0;
         }
 
         .game-container {
             position: relative;
-            box-shadow: 0 20px 35px rgba(0,0,0,0.4), inset 0 0 0 2px rgba(255,255,255,0.1);
-            border-radius: 20px;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.4);
+            border-radius: 0px;
             background: #000;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         canvas {
             display: block;
-            width: 100%;
-            height: auto;
-            border-radius: 18px;
+            width: auto;
+            height: 100vh;
+            aspect-ratio: 400 / 600;
             cursor: pointer;
+            object-fit: contain;
+            background: #000;
         }
 
         /* UI panelleri */
         .ui-overlay {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
@@ -50,57 +59,87 @@
         }
 
         .score-panel {
-            position: absolute;
+            position: fixed;
             top: 20px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 48px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 3px 3px 0 #000000aa;
-            font-family: monospace;
-            letter-spacing: 2px;
-            pointer-events: none;
-            background: rgba(0,0,0,0.4);
-            display: inline-block;
-            width: fit-content;
-            margin: 0 auto;
-            padding: 8px 20px;
-            border-radius: 60px;
-            backdrop-filter: blur(4px);
             left: 50%;
             transform: translateX(-50%);
-            white-space: nowrap;
+            text-align: center;
+            pointer-events: none;
+            background: rgba(0,0,0,0.5);
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+            padding: 8px 20px;
+            display: flex;
+            gap: 8px;
+            z-index: 20;
+        }
+
+        .score-digit {
+            width: 36px;
+            height: 42px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* SVG Menü */
+        .svg-menu {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 60px;
+            padding: 12px 24px;
+            display: flex;
+            gap: 20px;
+            z-index: 30;
+            pointer-events: auto;
+            border: 1px solid rgba(255,215,0,0.5);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .svg-menu svg {
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .svg-menu svg:hover {
+            transform: scale(1.1);
+        }
+
+        .svg-menu svg:active {
+            transform: scale(0.95);
         }
 
         .question-modal {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(12px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 200;
             pointer-events: auto;
-            transition: all 0.2s ease;
             font-family: 'Segoe UI', 'Courier New', monospace;
         }
 
         .question-card {
-            background: #fef9e8;
+            background: linear-gradient(135deg, #fff5e6 0%, #ffe6cc 100%);
             width: 85%;
-            max-width: 380px;
-            border-radius: 48px;
+            max-width: 420px;
+            border-radius: 56px;
             padding: 28px 22px 32px;
             text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            border: 3px solid #ffcd7e;
-            animation: bouncePop 0.3s cubic-bezier(0.34,1.2,0.8,1);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.6);
+            border: 3px solid #ffb347;
+            animation: bouncePop 0.35s cubic-bezier(0.34,1.2,0.8,1);
         }
 
         @keyframes bouncePop {
@@ -110,19 +149,19 @@
 
         .question-card h2 {
             font-size: 28px;
-            background: #ffb347;
+            background: #ff8c42;
             display: inline-block;
-            padding: 5px 18px;
+            padding: 6px 20px;
             border-radius: 50px;
             color: white;
             margin-bottom: 20px;
         }
 
         .question-text {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: bold;
-            margin: 25px 0;
-            color: #2c3e2f;
+            margin: 20px 0;
+            color: #2d3e2b;
             line-height: 1.4;
             background: #fff0d4;
             padding: 18px;
@@ -142,12 +181,12 @@
             border: none;
             font-size: 26px;
             font-weight: bold;
-            padding: 12px 20px;
+            padding: 12px 24px;
             min-width: 100px;
             border-radius: 60px;
             color: white;
             cursor: pointer;
-            transition: 0.1s linear;
+            transition: 0.05s linear;
             box-shadow: 0 5px 0 #1d3e1a;
             font-family: monospace;
         }
@@ -157,41 +196,59 @@
             box-shadow: 0 2px 0 #1d3e1a;
         }
 
-        .restart-hint {
+        .wrong-message {
             margin-top: 12px;
-            font-size: 14px;
-            color: #7e5e3a;
-            background: #ffe2b5;
-            border-radius: 30px;
-            padding: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #d9534f;
+            background: #fff0e0;
+            border-radius: 40px;
+            padding: 8px;
+            animation: shake 0.4s ease;
         }
 
-        .message-start {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            pointer-events: none;
-            background: rgba(0,0,0,0.7);
-            padding: 15px 25px;
-            border-radius: 60px;
-            color: gold;
-            font-weight: bold;
-            font-size: 24px;
-            white-space: nowrap;
-            font-family: monospace;
-            z-index: 15;
+        @keyframes shake {
+            0%,100%{ transform: translateX(0); }
+            25%{ transform: translateX(-6px); }
+            75%{ transform: translateX(6px); }
         }
 
         .hide {
-            display: none;
+            display: none !important;
+        }
+
+        .gameover-temp {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 150;
+            pointer-events: none;
+            animation: fadeOut 2s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; visibility: visible; }
+            80% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .gameover-img {
+            max-width: 80%;
+            max-height: 40%;
+            object-fit: contain;
         }
 
         @media (max-width: 550px) {
-            .score-panel { font-size: 36px; top: 12px; padding: 4px 18px;}
+            .score-digit { width: 28px; height: 34px; }
             .question-text { font-size: 20px; }
             .opt-btn { font-size: 22px; padding: 8px 16px; min-width: 80px; }
+            .svg-menu { padding: 8px 18px; gap: 12px; bottom: 20px; }
         }
     </style>
 </head>
@@ -199,49 +256,53 @@
 <div class="game-container">
     <canvas id="gameCanvas" width="400" height="600"></canvas>
     <div class="ui-overlay">
-        <div class="score-panel" id="scoreDisplay">0</div>
-        <div id="startMessage" class="message-start">🕹️ DOKUN / TIKLA BAŞLA 🕹️</div>
+        <div id="scorePanel" class="score-panel"></div>
+    </div>
+    <!-- SVG Menü -->
+    <div id="svgMenu" class="svg-menu">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" id="restartSvg">
+            <path d="M12 4V1L8 5L12 9V6C15.31 6 18 8.69 18 12C18 13.01 17.74 13.97 17.27 14.8L18.76 16.29C19.54 14.98 20 13.53 20 12C20 7.58 16.42 4 12 4Z" fill="#FFD966"/>
+            <path d="M12 18C8.69 18 6 15.31 6 12C6 10.99 6.26 10.03 6.73 9.2L5.24 7.71C4.46 9.02 4 10.47 4 12C4 16.42 7.58 20 12 20V23L16 19L12 15V18Z" fill="#FFD966"/>
+            <circle cx="12" cy="12" r="2" fill="#FFA500"/>
+        </svg>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" id="infoSvg">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="#4CAF50"/>
+        </svg>
     </div>
     <div id="questionModal" class="question-modal hide">
         <div class="question-card">
             <h2>📐 MATEMATİK</h2>
             <div class="question-text" id="questionText">Soru yükleniyor...</div>
             <div class="options" id="optionsContainer"></div>
-            <div class="restart-hint">✨ Doğru cevap ver, yeni kuş uçsun! ✨</div>
+            <div id="wrongMsg" class="wrong-message hide">❌ Yanlış! Başka bir soru yap bakalım ❌</div>
         </div>
     </div>
 </div>
 
 <script>
     (function(){
-        // ------------------- ASSETLER (Sprite haritası doğrudan base64 yedeği değil, ama URL.createObjectURL kullanmadan direk resim yolu: 
-        // gerçek projede dosyalar yan yana. index.html ile aynı dizinde "sprites" ve "audio" klasörleri mevcut. 
-        // Tüm assetleri kullanıyoruz. Ayrıca sayı sprite'ları 0.png ... 9.png ve A.png skor için vs. Haberin olsun.
-        // Oyun içinde skor rakamlarını göstermek için canvas üzerine çizim yaparken sayı sprite'larını kullanıyoruz.
-        
-        // Canvas ayarları
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Oyun sabitleri
         const W = 400, H = 600;
-        const GRAVITY = 0.2;
-        const JUMP_FORCE = -5.2;
+        const GRAVITY = 0.22;
+        const JUMP_FORCE = -5.1;
         const PIPE_WIDTH = 52;
         const PIPE_GAP = 140;
-        const PIPE_SPACING = 220;
+        const PIPE_SPACING = 230;
         const BIRD_SIZE = 34;
         
-        // Oyun durumları
-        let gameState = 'start'; // start, playing, gameover, question
+        let gameState = 'start'; // start, playing, gameover, showingGameoverImg, question
         let score = 0;
-        let frame = 0;
         let bird = { x: 70, y: H/2, vy: 0, rotation: 0 };
         let pipes = [];
-        let bgOffset = 0;
         let groundX = 0;
+        let showGameoverTimer = null;
+        let currentQuestionObj = null;
+        let usedQuestionIds = new Set();     // çıkan soru id'lerini tutar
+        let allQuestions = [];
         
-        // Ses nesneleri (assets/audio klasöründe mevcut)
+        // Sesler
         const audioFiles = {
             wing: new Audio('audio/wing.wav'),
             point: new Audio('audio/point.wav'),
@@ -249,34 +310,28 @@
             die: new Audio('audio/die.wav'),
             swoosh: new Audio('audio/swoosh.wav')
         };
-        // Seslerin ön yüklemesi
-        for(let key in audioFiles){
-            audioFiles[key].load();
-            audioFiles[key].volume = 0.5;
+        for(let k in audioFiles){
+            audioFiles[k].load();
+            audioFiles[k].volume = 0.5;
         }
-        
         function playSound(soundId){
             try{
                 let snd = audioFiles[soundId];
                 if(snd){
                     snd.currentTime = 0;
-                    snd.play().catch(e=>console.log("ses engeli",e));
+                    snd.play().catch(e=>console.log("ses engeli"));
                 }
             }catch(e){}
         }
         
-        // ------------------- GÖRSEL SPRITE YÜKLEME (sprites klasörü)
+        // Sprite yükleme (sprites klasörü)
         const spriteImages = {};
         const spriteNames = [
             'background-day', 'background-night', 'base',
-            'bluebird-downflap', 'bluebird-midflap', 'bluebird-upflap',
-            'redbird-downflap', 'redbird-midflap', 'redbird-upflap',
             'yellowbird-downflap', 'yellowbird-midflap', 'yellowbird-upflap',
             'pipe-green', 'pipe-red', 'gameover', 'message'
         ];
-        // sayı sprite'ları 0-9 ve A
         for(let i=0;i<=9;i++) spriteNames.push(`${i}`);
-        spriteNames.push('A');
         
         let loadedAssets = 0;
         let totalAssets = spriteNames.length;
@@ -287,26 +342,400 @@
                 const img = new Image();
                 img.onload = () => { loadedAssets++; if(loadedAssets === totalAssets) assetsReady = true; };
                 img.onerror = () => { loadedAssets++; if(loadedAssets === totalAssets) assetsReady = true; };
-                // dosya yolları sprites/ adı.png (A.png, 0.png vb)
                 img.src = `sprites/${name}.png`;
                 spriteImages[name] = img;
             }
         }
         loadSprites();
         
-        // Kuş rengi: sarı (yellowbird) kullan
-        let birdAnimFrame = 0;
         const birdVariants = ['yellowbird-upflap', 'yellowbird-midflap', 'yellowbird-downflap'];
         
-        // ------------------- MATEMATİK SORU BANKASI (7.sınıf doğru orantı - ters orantı) 90+ soru
-        const questionBank = [];
-        
-        function generateQuestions(){
-            // 90 soru üret: Doğru Orantı (DO) ve Ters Orantı (TO) karışık
-            const ornekler = [
+        // ------------------- MATEMATİK SORU BANKASI (7. Sınıf - Doğru/Ters Orantı) 95+ soru
+        function buildQuestionBank(){
+            const bank = [];
+            const baseTemplates = [
                 {text:"3 kg elma 18 TL ise 5 kg elma kaç TL'dir? (Doğru Orantı)", answer:30, type:"DO"},
                 {text:"Bir işi 6 işçi 10 günde bitiriyorsa, 12 işçi kaç günde bitirir? (Ters Orantı)", answer:5, type:"TO"},
-                {text:"Bir aracın hızı 80 km/sa iken 5 saatte gittiği yolu, 100 km/sa hızla kaç saatte gider? (Ters)", answer:4, type:"TO"},
+                {text:"Hızı 80 km/sa iken 5 saatte giden yol, 100 km/sa hızla kaç saatte gider? (Ters)", answer:4, type:"TO"},
+                {text:"4 kalem 28 TL ise 7 kalem kaç TL'dir? (Doğru)", answer:49, type:"DO"},
+                {text:"20 işçi bir duvarı 8 günde örerse, 16 işçi kaç günde örer? (Ters)", answer:10, type:"TO"},
+                {text:"2 saatte 120 km yol giden araç, 5 saatte kaç km yol gider? (Doğru)", answer:300, type:"DO"},
+                {text:"Bir otobüs 90 km/sa ile 4 saatte gittiği yolu 120 km/sa ile kaç saatte gider? (Ters)", answer:3, type:"TO"},
+                {text:"5 kg fındık 200 TL ise 8 kg fındık kaç TL? (Doğru)", answer:320, type:"DO"},
+                {text:"8 işçi 15 günde yaparsa, 10 işçi kaç günde yapar? (Ters)", answer:12, type:"TO"},
+                {text:"12 m kumaş 360 TL ise 7 m kumaş kaç TL? (Doğru)", answer:210, type:"DO"},
+                {text:"Bir havuzu 4 pompa 9 saatte doldurursa, 6 pompa kaç saatte doldurur? (Ters)", answer:6, type:"TO"},
+                {text:"3 kg portakaldan 1.2 L meyve suyu çıkıyorsa, 5 kg portakaldan kaç L çıkar? (Doğru)", answer:2, type:"DO", decimal:true},
+                {text:"Bir usta 8 saatte 64 parça iş yapıyorsa 5 saatte kaç parça yapar? (Doğru)", answer:40, type:"DO"},
+                {text:"10 işçi 12 günde bitirirse, 15 işçi kaç günde bitirir? (Ters)", answer:8, type:"TO"},
+                {text:"7 kg üzüm 84 TL ise 9 kg üzüm kaç TL? (Doğru)", answer:108, type:"DO"}
+            ];
+            // 95+ soru üret
+            for(let i=0;i<100;i++){
+                let base = baseTemplates[i % baseTemplates.length];
+                let newText = base.text;
+                let newAnswer = base.answer;
+                let type = base.type;
+                if(i >= baseTemplates.length){
+                    let r = (i*3 % 10)+2;
+                    let r2 = (i*7 % 8)+3;
+                    if(type==="DO"){
+                        if(base.text.includes("3 kg elma")){
+                            newText = `${r} kg elma ${r*6} TL ise ${r+2} kg elma kaç TL? (Doğru Orantı)`;
+                            newAnswer = (r+2)*6;
+                        }else if(base.text.includes("4 kalem")){
+                            newText = `${r} kalem ${r*7} TL ise ${r+3} kalem kaç TL?`;
+                            newAnswer = (r+3)*7;
+                        }else{
+                            newText = `${r} kg fındık ${r*40} TL ise ${r+2} kg fındık kaç TL?`;
+                            newAnswer = (r+2)*40;
+                        }
+                    } else {
+                        if(base.text.includes("6 işçi")){
+                            newText = `${r} işçi 10 günde bitiriyorsa, ${r*2} işçi kaç günde bitirir? (Ters Orantı)`;
+                            newAnswer = (r*10)/(r*2);
+                        }else{
+                            newText = `Hızı ${r*20} km/sa iken 4 saatte giden yol, ${r*25} km/sa ile kaç saat? (Ters)`;
+                            newAnswer = (r*20*4)/(r*25);
+                        }
+                    }
+                    if(!Number.isInteger(newAnswer)) newAnswer = parseFloat(newAnswer.toFixed(1));
+                }
+                let answerVal = newAnswer;
+                let optionsSet = new Set([answerVal]);
+                while(optionsSet.size < 4){
+                    let variation = answerVal + (Math.floor(Math.random()*11)-5);
+                    if(variation <= 0) variation = answerVal+1;
+                    if(Math.abs(variation - answerVal) > 0.01) optionsSet.add(Math.abs(variation));
+                }
+                let opts = Array.from(optionsSet).sort(()=>Math.random()-0.5);
+                bank.push({
+                    id: i,
+                    text: newText,
+                    correct: answerVal,
+                    options: opts,
+                    isDecimal: (answerVal % 1 !== 0)
+                });
+            }
+            return bank;
+        }
+        
+        allQuestions = buildQuestionBank();
+        
+        // Kullanılmamış yeni soru getir (çıkan soru bir daha çıkmasın)
+        function getUnusedQuestion(){
+            if(usedQuestionIds.size >= allQuestions.length){
+                usedQuestionIds.clear();
+            }
+            let available = allQuestions.filter(q => !usedQuestionIds.has(q.id));
+            if(available.length === 0){
+                usedQuestionIds.clear();
+                available = allQuestions;
+            }
+            let selected = available[Math.floor(Math.random() * available.length)];
+            usedQuestionIds.add(selected.id);
+            return {...selected};
+        }
+        
+        // Skor panelini PNG'lerle güncelle (0-9 arası sprite'lar)
+        function updateScoreUIWithSprites(){
+            const panel = document.getElementById('scorePanel');
+            panel.innerHTML = '';
+            let scoreStr = score.toString();
+            for(let ch of scoreStr){
+                let digit = ch;
+                if(spriteImages[digit] && spriteImages[digit].complete){
+                    let div = document.createElement('div');
+                    div.className = 'score-digit';
+                    div.style.backgroundImage = `url(${spriteImages[digit].src})`;
+                    div.style.backgroundSize = 'contain';
+                    div.style.backgroundRepeat = 'no-repeat';
+                    panel.appendChild(div);
+                } else {
+                    let span = document.createElement('span');
+                    span.textContent = digit;
+                    span.style.fontSize = '38px';
+                    span.style.fontWeight = 'bold';
+                    span.style.color = 'white';
+                    span.style.textShadow = '2px 2px 0 black';
+                    panel.appendChild(span);
+                }
+            }
+        }
+        
+        function resetGameMechanics(){
+            score = 0;
+            updateScoreUIWithSprites();
+            bird.y = H/2;
+            bird.vy = 0;
+            bird.rotation = 0;
+            pipes = [];
+            groundX = 0;
+            generateInitialPipes();
+        }
+        
+        function generateInitialPipes(){
+            pipes = [];
+            for(let i=0; i<3; i++){
+                let pipeX = W + i * PIPE_SPACING;
+                let pipeY = Math.random() * (H - PIPE_GAP - 100) + 50;
+                pipes.push({ x: pipeX, y: pipeY, counted: false });
+            }
+        }
+        
+        function gameOverSequence(){
+            if(gameState !== 'playing') return;
+            gameState = 'showingGameoverImg';
+            playSound('hit');
+            playSound('die');
+            
+            // gameover.png 2 saniye göster
+            const overlayDiv = document.createElement('div');
+            overlayDiv.className = 'gameover-temp';
+            const goImg = spriteImages['gameover'];
+            if(goImg && goImg.complete){
+                const imgElem = document.createElement('img');
+                imgElem.src = goImg.src;
+                imgElem.className = 'gameover-img';
+                overlayDiv.appendChild(imgElem);
+            } else {
+                overlayDiv.innerHTML = '<div style="color:white;font-size:32px;">GAME OVER</div>';
+            }
+            document.body.appendChild(overlayDiv);
+            
+            setTimeout(() => {
+                if(overlayDiv && overlayDiv.remove) overlayDiv.remove();
+                // 2 saniye sonra soru modalını göster
+                showNewQuestionModal();
+            }, 2000);
+        }
+        
+        function showNewQuestionModal(){
+            currentQuestionObj = getUnusedQuestion();
+            const modal = document.getElementById('questionModal');
+            const questionTextDiv = document.getElementById('questionText');
+            const optionsDiv = document.getElementById('optionsContainer');
+            const wrongMsgDiv = document.getElementById('wrongMsg');
+            wrongMsgDiv.classList.add('hide');
+            
+            let qText = currentQuestionObj.text;
+            if(currentQuestionObj.isDecimal) qText += " (Ondalık)";
+            questionTextDiv.innerText = qText;
+            optionsDiv.innerHTML = '';
+            currentQuestionObj.options.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                let displayVal = (opt % 1 !== 0) ? opt.toFixed(1) : opt;
+                btn.innerText = displayVal;
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    let userAnswer = opt;
+                    let isCorrect = (Math.abs(userAnswer - currentQuestionObj.correct) < 0.01);
+                    if(isCorrect){
+                        playSound('swoosh');
+                        modal.classList.add('hide');
+                        // Doğru cevap -> game menusune at (ana menü start)
+                        resetGameMechanics();
+                        gameState = 'start';
+                        document.getElementById('svgMenu').classList.remove('hide');
+                        // start mesajını canvas içinde göster
+                    } else {
+                        // Yanlış: "Yanlış! Başka bir soru yap bakalım" yaz, başka soru gelsin
+                        playSound('hit');
+                        wrongMsgDiv.classList.remove('hide');
+                        wrongMsgDiv.innerText = '❌ Yanlış! Başka bir soru yap bakalım ❌';
+                        // yeni soru al (çıkan soru bir daha çıkmasın)
+                        currentQuestionObj = getUnusedQuestion();
+                        let newQText = currentQuestionObj.text;
+                        if(currentQuestionObj.isDecimal) newQText += " (Ondalık)";
+                        questionTextDiv.innerText = newQText;
+                        optionsDiv.innerHTML = '';
+                        currentQuestionObj.options.forEach(opt2 => {
+                            let btn2 = document.createElement('button');
+                            btn2.className = 'opt-btn';
+                            let displayVal2 = (opt2 % 1 !== 0) ? opt2.toFixed(1) : opt2;
+                            btn2.innerText = displayVal2;
+                            btn2.onclick = arguments.callee;
+                            optionsDiv.appendChild(btn2);
+                        });
+                        // yeniden düzenle
+                        const newBtn = optionsDiv.children;
+                        for(let i=0;i<newBtn.length;i++){
+                            newBtn[i].onclick = (e) => {
+                                let ans = currentQuestionObj.options[i];
+                                let correctAns = currentQuestionObj.correct;
+                                if(Math.abs(ans - correctAns) < 0.01){
+                                    playSound('swoosh');
+                                    modal.classList.add('hide');
+                                    resetGameMechanics();
+                                    gameState = 'start';
+                                    document.getElementById('svgMenu').classList.remove('hide');
+                                } else {
+                                    playSound('hit');
+                                    wrongMsgDiv.classList.remove('hide');
+                                    wrongMsgDiv.innerText = '❌ Yanlış! Başka bir soru yap bakalım ❌';
+                                    currentQuestionObj = getUnusedQuestion();
+                                    questionTextDiv.innerText = currentQuestionObj.text + (currentQuestionObj.isDecimal ? " (Ondalık)" : "");
+                                    optionsDiv.innerHTML = '';
+                                    currentQuestionObj.options.forEach(opt3 => {
+                                        let b = document.createElement('button');
+                                        b.className = 'opt-btn';
+                                        b.innerText = (opt3 % 1 !== 0) ? opt3.toFixed(1) : opt3;
+                                        optionsDiv.appendChild(b);
+                                    });
+                                    for(let k=0;k<optionsDiv.children.length;k++){
+                                        optionsDiv.children[k].onclick = arguments.callee;
+                                    }
+                                }
+                            };
+                        }
+                    }
+                };
+                optionsDiv.appendChild(btn);
+            });
+            modal.classList.remove('hide');
+            gameState = 'question';
+        }
+        
+        function updateGame(){
+            if(gameState !== 'playing') return;
+            bird.vy += GRAVITY;
+            bird.y += bird.vy;
+            if(bird.y + BIRD_SIZE/2 > H - 50) {
+                bird.y = H - 50 - BIRD_SIZE/2;
+                gameOverSequence();
+                return;
+            }
+            if(bird.y - BIRD_SIZE/2 < 0){
+                bird.y = BIRD_SIZE/2;
+                bird.vy = 0;
+            }
+            for(let i=0; i<pipes.length; i++){
+                pipes[i].x -= 2.2;
+                if(pipes[i].x + PIPE_WIDTH < 0){
+                    pipes.splice(i,1);
+                    i--;
+                    continue;
+                }
+                if(!pipes[i].counted && pipes[i].x + PIPE_WIDTH < bird.x){
+                    pipes[i].counted = true;
+                    score++;
+                    updateScoreUIWithSprites();
+                    playSound('point');
+                }
+                let birdLeft = bird.x - BIRD_SIZE/2;
+                let birdRight = bird.x + BIRD_SIZE/2;
+                let birdTop = bird.y - BIRD_SIZE/2;
+                let birdBottom = bird.y + BIRD_SIZE/2;
+                let pipeTopY = pipes[i].y;
+                let pipeBottomY = pipes[i].y + PIPE_GAP;
+                if(birdRight > pipes[i].x && birdLeft < pipes[i].x + PIPE_WIDTH){
+                    if(birdTop < pipeTopY || birdBottom > pipeBottomY){
+                        gameOverSequence();
+                        return;
+                    }
+                }
+            }
+            if(pipes.length === 0 || pipes[pipes.length-1].x < W - PIPE_SPACING){
+                let newY = Math.random() * (H - PIPE_GAP - 100) + 50;
+                pipes.push({ x: W, y: newY, counted: false });
+            }
+            bird.rotation = Math.min(Math.max(bird.vy * 3, -30), 60);
+            groundX = (groundX - 2) % 56;
+        }
+        
+        function draw(){
+            if(!assetsReady){
+                ctx.fillStyle="#222";
+                ctx.fillRect(0,0,W,H);
+                ctx.fillStyle="white";
+                ctx.font="16px monospace";
+                ctx.fillText("Yükleniyor...",W/2-50,H/2);
+                return;
+            }
+            let bgImg = spriteImages['background-day'] || spriteImages['background-night'];
+            if(bgImg) ctx.drawImage(bgImg,0,0,W,H);
+            else { ctx.fillStyle="#4ec0ca"; ctx.fillRect(0,0,W,H); }
+            
+            let pipeImg = spriteImages['pipe-green'] || spriteImages['pipe-red'];
+            for(let p of pipes){
+                if(pipeImg){
+                    ctx.drawImage(pipeImg, p.x, p.y - 320, PIPE_WIDTH, 320);
+                    ctx.drawImage(pipeImg, p.x, p.y + PIPE_GAP, PIPE_WIDTH, H - p.y - PIPE_GAP);
+                } else {
+                    ctx.fillStyle="#228B22";
+                    ctx.fillRect(p.x, p.y-320, PIPE_WIDTH, 320);
+                    ctx.fillRect(p.x, p.y+PIPE_GAP, PIPE_WIDTH, H-p.y-PIPE_GAP);
+                }
+            }
+            let baseImg = spriteImages['base'];
+            if(baseImg){
+                for(let i=0;i<3;i++) ctx.drawImage(baseImg, groundX + i*336, H-50, 336, 50);
+            } else {
+                ctx.fillStyle="#ded895";
+                ctx.fillRect(0,H-50,W,50);
+            }
+            let birdSprite = spriteImages[birdVariants[Math.floor(Date.now()/100)%3]];
+            if(!birdSprite) birdSprite = spriteImages['yellowbird-midflap'];
+            ctx.save();
+            ctx.translate(bird.x, bird.y);
+            ctx.rotate(bird.rotation * Math.PI/180);
+            ctx.drawImage(birdSprite, -BIRD_SIZE/2, -BIRD_SIZE/2, BIRD_SIZE, BIRD_SIZE);
+            ctx.restore();
+            
+            if(gameState === 'start'){
+                let msgImg = spriteImages['message'];
+                if(msgImg) ctx.drawImage(msgImg, W/2-92, H/2-70, 184, 100);
+                else {
+                    ctx.fillStyle="rgba(0,0,0,0.7)";
+                    ctx.fillRect(W/2-100, H/2-50, 200, 60);
+                    ctx.fillStyle="white";
+                    ctx.fillText("TAP TO START",W/2-70,H/2-15);
+                }
+            }
+        }
+        
+        function jump(){
+            if(gameState === 'playing'){
+                bird.vy = JUMP_FORCE;
+                playSound('wing');
+            } else if(gameState === 'start'){
+                gameState = 'playing';
+                resetGameMechanics();
+                bird.vy = JUMP_FORCE;
+                playSound('wing');
+            }
+        }
+        
+        // SVG menü işlevleri
+        document.getElementById('restartSvg').addEventListener('click', () => {
+            if(gameState === 'playing' || gameState === 'start' || gameState === 'question'){
+                resetGameMechanics();
+                gameState = 'start';
+                const modal = document.getElementById('questionModal');
+                if(!modal.classList.contains('hide')) modal.classList.add('hide');
+            }
+        });
+        document.getElementById('infoSvg').addEventListener('click', () => {
+            alert("🐦 FlappyMath 🧮\n7. Sınıf Doğru ve Ters Orantı\nÖldüğünde soruyu doğru cevapla! Her yanlışta yeni soru gelir.");
+        });
+        
+        canvas.addEventListener('click', (e) => { e.preventDefault(); jump(); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); jump(); });
+        
+        resetGameMechanics();
+        updateScoreUIWithSprites();
+        setInterval(() => { if(gameState === 'playing') updateScoreUIWithSprites(); }, 100);
+        function animate(){
+            updateGame();
+            draw();
+            requestAnimationFrame(animate);
+        }
+        animate();
+    })();
+</script>
+</body>
+</html>                {text:"Bir aracın hızı 80 km/sa iken 5 saatte gittiği yolu, 100 km/sa hızla kaç saatte gider? (Ters)", answer:4, type:"TO"},
                 {text:"4 kalem 28 TL ise 7 kalem kaç TL'dir? (Doğru)", answer:49, type:"DO"},
                 {text:"20 işçi bir duvarı 8 günde örerse, 16 işçi kaç günde örer? (Ters)", answer:10, type:"TO"},
                 {text:"Bir musluk 6 saatte havuzu dolduruyorsa, aynı debide 4 musluk kaç saatte doldurur? (Ters)", answer:1.5, type:"TO", isDecimal:true},
